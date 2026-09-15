@@ -8,6 +8,8 @@ The first version should be simple, clear, and professional. It should help a re
 
 This design uses a database-backed content model so the information is organized and easy to maintain. The public site can remain lightweight and fast, while the data layer supports future features such as project management, job tracking, and networking tools.
 
+A key reliability requirement is that the public profile must stay visible even when the database is unavailable. The site should use a fallback strategy, such as a static cached snapshot or locally stored fallback content, so recruiters can still access the resume regardless of database outages.
+
 ## 2. Problem Statement
 
 A student or early-career professional often needs a website that serves as a digital resume, portfolio, and personal brand page. However, many simple resume sites are hard to maintain because their content is embedded directly into code and not organized as reusable data.
@@ -262,6 +264,17 @@ The application should separate:
 
 This allows the website to show the same content while keeping the management process controlled and manageable.
 
+### 8.4 Fallback and resilience
+The public profile must remain visible when the database is unavailable. The site should not render an empty or broken page during a database outage.
+
+Recommended behavior:
+- keep a recent cached version of the profile content for the public site
+- if the database is unreachable, serve the last known valid data snapshot instead of failing entirely
+- log the outage for internal review while preserving site availability
+- ensure the admin editing experience clearly indicates when the system is in fallback mode
+
+This requirement is important because the site is intended to serve professional visibility and recruiting needs; reliability matters even when the content backend is temporarily unavailable.
+
 ## 9. Technical Direction
 
 ### Recommended approach for version 1
@@ -343,10 +356,11 @@ The design is successful if the first version:
 - is easy to update as the user grows
 - can be hosted cheaply and simply
 - is based on structured, reusable data
+- keeps the profile visible even when the database is unavailable
 - has a clear path to become a broader career platform later
 
 ## 14. Recommended Decision
 
-The project should be built as a low-cost, database-backed personal resume and portfolio website with a structured content model and a simple admin layer. This is the best balance between usability, maintainability, and future growth.
+The project should be built as a low-cost, database-backed personal resume and portfolio website with a structured content model, a simple admin layer, and a public fallback strategy that keeps the profile visible during database outages. This is the best balance between usability, maintainability, reliability, and future growth.
 
 It delivers immediate value to the user while building the foundation for a larger career platform without requiring a major redesign later.
