@@ -17,6 +17,16 @@ DEFAULT_PROFILE = {
     "email": "alex.carter@example.com",
 }
 
+DEFAULT_PUBLIC_PROFILE = {
+    **DEFAULT_PROFILE,
+    "experience": [],
+    "education": [],
+    "skills": [],
+    "projects": [],
+    "links": [],
+    "settings": {"site_title": "Career Platform", "profile_visible": 1},
+}
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS profile (
     id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -72,11 +82,11 @@ def _snapshot_path_for(database_path: Path | None = None) -> Path:
     return path.parent / "profile_snapshot.json"
 
 
-def _default_profile() -> dict[str, str]:
-    return deepcopy(DEFAULT_PROFILE)
+def _default_profile() -> dict[str, Any]:
+    return deepcopy(DEFAULT_PUBLIC_PROFILE)
 
 
-def read_profile_snapshot(database_path: Path | None = None) -> dict[str, str]:
+def read_profile_snapshot(database_path: Path | None = None) -> dict[str, Any]:
     snapshot_path = _snapshot_path_for(database_path)
     if not snapshot_path.exists():
         return write_profile_snapshot(_default_profile(), database_path)
@@ -90,14 +100,20 @@ def read_profile_snapshot(database_path: Path | None = None) -> dict[str, str]:
         return write_profile_snapshot(_default_profile(), database_path)
 
     merged = _default_profile()
-    merged.update({str(key): str(value) for key, value in data.items()})
+    for key, value in data.items():
+        if key in {"experience", "education", "skills", "projects", "links"}:
+            merged[key] = value if isinstance(value, list) else []
+        elif key == "settings":
+            merged[key] = value if isinstance(value, dict) else merged["settings"]
+        else:
+            merged[str(key)] = str(value)
     return merged
 
 
-def write_profile_snapshot(profile: dict[str, Any], database_path: Path | None = None) -> dict[str, str]:
+def write_profile_snapshot(profile: dict[str, Any], database_path: Path | None = None) -> dict[str, Any]:
     snapshot_path = _snapshot_path_for(database_path)
     snapshot_path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {str(key): str(value) for key, value in profile.items()}
+    payload = profile
     snapshot_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return payload
 
@@ -191,7 +207,7 @@ def initialize_database(database_path: Path | None = None) -> None:
         )
 
 
-def load_public_profile(database_path: Path | None = None) -> dict[str, str]:
+def load_public_profile(database_path: Path | None = None) -> dict[str, Any]:
     """Return live profile data when available, else the last known good snapshot."""
     path = database_path or get_settings().database_path
     try:
@@ -199,9 +215,22 @@ def load_public_profile(database_path: Path | None = None) -> dict[str, str]:
         with sqlite3.connect(path) as connection:
             connection.row_factory = sqlite3.Row
             row = connection.execute("SELECT * FROM profile WHERE id = 1").fetchone()
-        if row is None:
-            raise RuntimeError("The resume profile is not initialized")
-        profile = dict(row)
+            if row is None:
+                raise RuntimeError("The resume profile is not initialized")
+            profile = dict(row)
+            for table, order_by in (
+                ("experience", "id"),
+                ("education", "id"),
+                ("skills", "category, id"),
+                ("projects", "id"),
+                ("links", "id"),
+            ):
+                profile[table] = [
+                    dict(item)
+                    for item in connection.execute(f"SELECT * FROM {table} ORDER BY {order_by}").fetchall()
+                ]
+            settings_row = connection.execute("SELECT * FROM settings WHERE id = 1").fetchone()
+            profile["settings"] = dict(settings_row) if settings_row else deepcopy(DEFAULT_PUBLIC_PROFILE["settings"])
         write_profile_snapshot(profile, path)
         return profile
     except (sqlite3.Error, OSError, RuntimeError):
