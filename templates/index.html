@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ profile.name }} | {{ profile.headline }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  </head>
+  <body>
+    <main class="profile">
+      <p class="eyebrow">Resume &amp; Portfolio</p>
+      <h1>{{ profile.name }}</h1>
+      <h2>{{ profile.headline }}</h2>
+      <p>{{ profile.summary }}</p>
+      <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+:root {
+  color: #172033;
+  background: #f4f7fb;
+  font-family: system-ui, sans-serif;
+}
+
+body { margin: 0; }
+
+.profile {
+  max-width: 48rem;
+  margin: 10vh auto;
+  padding: 3rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1rem 3rem rgb(23 32 51 / 10%);
+}
+
+.eyebrow {
+  color: #4966a0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 { margin-bottom: 0.5rem; }
+h2 { color: #4966a0; font-size: 1.25rem; font-weight: 500; }
