@@ -1,0 +1,113 @@
+{
+  "id": 1,
+  "name": "Alex Carter",
+  "headline": "Senior Business Analytics Student",
+  "summary": "Business analytics student focused on turning complex data into clear decisions, actionable insights, and measurable outcomes for organizations.",
+  "email": "alex.carter@example.com",
+  "experience": [
+    {
+      "id": 1,
+      "title": "Data Analyst Intern",
+      "company": "Northwind Retail",
+      "details": "Built SQL-based dashboards and KPI tracking for customer and merchandising data."
+    },
+    {
+      "id": 2,
+      "title": "Business Operations Assistant",
+      "company": "Civic Insights Group",
+      "details": "Supported forecasting, process improvement, and cross-functional reporting projects."
+    }
+  ],
+  "education": [
+    {
+      "id": 1,
+      "school": "Rensselaer Polytechnic Institute",
+      "degree": "Bachelor of Science",
+      "field": "Business Analytics",
+      "details": "Focus on data analysis, forecasting, and decision support systems."
+    },
+    {
+      "id": 2,
+      "school": "University of Washington",
+      "degree": "Certificate",
+      "field": "Business Intelligence",
+      "details": "Completed coursework in SQL, Excel analytics, and data storytelling."
+    }
+  ],
+  "skills": [
+    {
+      "id": 5,
+      "name": "Forecasting",
+      "category": "analytical"
+    },
+    {
+      "id": 6,
+      "name": "Data Visualization",
+      "category": "analytical"
+    },
+    {
+      "id": 7,
+      "name": "Stakeholder Communication",
+      "category": "business"
+    },
+    {
+      "id": 8,
+      "name": "Project Management",
+      "category": "business"
+    },
+    {
+      "id": 1,
+      "name": "SQL",
+      "category": "technical"
+    },
+    {
+      "id": 2,
+      "name": "Python",
+      "category": "technical"
+    },
+    {
+      "id": 3,
+      "name": "Excel",
+      "category": "technical"
+    },
+    {
+      "id": 4,
+      "name": "Power BI",
+      "category": "technical"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "Revenue Trend Dashboard",
+      "summary": "Built an executive dashboard tracking revenue and funnel metrics."
+    },
+    {
+      "id": 2,
+      "title": "Customer Retention Study",
+      "summary": "Analyzed churn drivers and recommended actions for loyalty programs."
+    }
+  ],
+  "links": [
+    {
+      "id": 1,
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com"
+    },
+    {
+      "id": 2,
+      "label": "GitHub",
+      "url": "https://github.com"
+    },
+    {
+      "id": 3,
+      "label": "Portfolio",
+      "url": "https://example.com"
+    }
+  ],
+  "settings": {
+    "id": 1,
+    "site_title": "Career Platform",
+    "profile_visible": 1
+  }
+}

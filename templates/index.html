@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ profile.summary }}">
+    <title>{{ profile.name }} | {{ profile.headline }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell nav">
+        <a class="brand" href="#top">{{ profile.name }}</a>
+        <nav aria-label="Primary navigation">
+          <a href="#experience">Experience</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow">Business analytics &amp; strategy</p>
+          <h1>{{ profile.name }}</h1>
+          <p class="headline">{{ profile.headline }}</p>
+          <p class="lede">{{ profile.summary }}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="mailto:{{ profile.email }}">Get in touch</a>
+            <a class="button button-secondary" href="#projects">View selected work</a>
+          </div>
+        </div>
+        <aside class="availability" aria-label="Contact details">
+          <span class="status-dot"></span>
+          <div>
+            <strong>Open to opportunities</strong>
+            <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+          </div>
+        </aside>
+      </section>
+
+      <div class="shell content-grid">
+        <div class="main-column">
+          <section id="experience" class="section">
+            <div class="section-heading">
+              <p class="eyebrow">Track record</p>
+              <h2>Experience</h2>
+            </div>
+            {% for item in profile.experience %}
+            <article class="timeline-item">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div>
+                <p class="item-kicker">{{ item.company }}</p>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.details }}</p>
+              </div>
+            </article>
+            {% else %}
+            <p class="muted">Professional experience will be added soon.</p>
+            {% endfor %}
+          </section>
+
+          <section id="projects" class="section">
+            <div class="section-heading">
+              <p class="eyebrow">Selected work</p>
+              <h2>Projects</h2>
+            </div>
+            <div class="project-grid">
+              {% for project in profile.projects %}
+              <article class="card project-card">
+                <span class="card-number">0{{ loop.index }}</span>
+                <h3>{{ project.title }}</h3>
+                <p>{{ project.summary }}</p>
+              </article>
+              {% else %}
+              <p class="muted">Project case studies will be added soon.</p>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <section id="skills" class="section compact-section">
+            <div class="section-heading">
+              <p class="eyebrow">Capabilities</p>
+              <h2>Skills</h2>
+            </div>
+            <div class="skill-list">
+              {% for skill in profile.skills %}
+              <span class="skill">{{ skill.name }}</span>
+              {% else %}
+              <p class="muted">Skills will be added soon.</p>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section id="education" class="section compact-section">
+            <div class="section-heading">
+              <p class="eyebrow">Foundation</p>
+              <h2>Education</h2>
+            </div>
+            {% for item in profile.education %}
+            <article class="education-item">
+              <h3>{{ item.school }}</h3>
+              <p><strong>{{ item.degree }}</strong> · {{ item.field }}</p>
+              <p>{{ item.details }}</p>
+            </article>
+            {% else %}
+            <p class="muted">Education details will be added soon.</p>
+            {% endfor %}
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer id="contact" class="footer">
+      <div class="shell footer-inner">
+        <div>
+          <p class="eyebrow">Let’s connect</p>
+          <h2>Have a role or project in mind?</h2>
+          <a class="footer-email" href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+        </div>
+        <div class="links" aria-label="Professional links">
+          {% for link in profile.links %}
+          <a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} <span aria-hidden="true">↗</span></a>
+          {% endfor %}
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
