@@ -97,6 +97,16 @@
   - Public page `http://<VM_PUBLIC_IP>:8000/` → 200. All the new content is present. Demo strings are absent: `Alex Carter`, `Northwind`, `Rensselaer`, `example.com`, and the old eyebrow. The log has 0 errors.
   - Leftovers on the VM: `data/resume.db.bak-demo-…` shows in `git status` as untracked (`data/*.db` doesn't match it), and `data/profile_snapshot.json` shows as modified (fact 5). Neither blocks pulls of commits that don't touch them.
 - **2026-09-29, Track record layout fix.** The live site showed the experience text squeezed into a ~1rem column, one word per line. Cause: `.timeline-item` was a `1rem 1fr` grid, but `.timeline-marker` is `position: absolute` and takes no grid cell, so the text landed in the 1rem track. Fix: removed `display: grid; gap; grid-template-columns` from `.timeline-item`. The marker and vertical line are unchanged. Checked with headless-Chrome screenshots before and after (1280px, and 500px, the narrowest headless renders) plus 10 tests passing. There's no automated test for this CSS. Commit `3d23e09`, pushed. The VM pulled it and serves the new CSS, and a live screenshot confirmed the fix. No restart was needed.
+- **2026-09-29, housekeeping.** The duplicate resume PDF in `docs/superpowers/specs/` was deleted (byte-identical to the kept copy). `.gitignore` now ignores `*.pdf` and `.DS_Store` (commit `e6181d2`), so the resume PDF at the repo root stays untracked. Rule: never publish the phone number or home address.
+- **Status when paused (2026-09-29): the site is live at `http://<VM_PUBLIC_IP>:8000/`, showing the resume content. `main` = `e6181d2` plus this entry.**
+  - Open items, in suggested order:
+    1. F2: save `ADMIN_SECRET` to a password manager (run the command in your own terminal).
+    2. NSG review: `Temp-HTTP-8000` (8000 from `*`) and `Allow-SSH-Laptop` (22 from `<OLD_LAPTOP_IP>`) were added outside this session. Narrow or remove them as needed.
+    3. uvicorn doesn't survive a reboot or deallocation. Restart it with PR1's command (`--host 0.0.0.0` to match the current state), or add a systemd unit.
+    4. `.env` says `HOST=127.0.0.1`, while the running process uses `--host 0.0.0.0` (the flag wins). Align them if you want `.env` to be accurate.
+    5. Fact 5: `data/profile_snapshot.json` is tracked and rewritten by the app. Consider untracking it.
+    6. Cleanup: merged local branches (`chore/uv-lock`, `fix/seed-only-new-database`, `content/resume-eyebrow`, `style/track-record-width`), the laptop DB backups `~/Desktop/github/resume.db.bak-*`, and the VM backup `data/resume.db.bak-demo-*`.
+  - Before resuming: re-check the laptop IP against `AllowSSHFromMyIP` (S1), and check the VM is running (S2).
 
 ---
 
