@@ -84,6 +84,19 @@
   - **Port 8000 is publicly reachable:** `http://<VM_PUBLIC_IP>:8000/` → `200` from the laptop. The NSG has two rules this session did not create: `Temp-HTTP-8000` (priority 310, TCP 8000 from `*`) and `Allow-SSH-Laptop` (priority 300, TCP 22 from the old laptop IP `<OLD_LAPTOP_IP>/32`). This supersedes V5's result and the "opens no other port" constraint.
   - `.env` still says `HOST=127.0.0.1`. The `--host 0.0.0.0` flag overrides it, because uvicorn's CLI flag wins and the app never reads `HOST`.
   - Found a problem with the PR1 undo: `pkill -f "uvicorn app.main:app"` run through `ssh` also matches the remote shell running it (its command line contains the same text), so it kills its own session (exit 255). It did stop uvicorn. The undo now uses the pattern `[u]vicorn app.main:app`, which doesn't match itself.
+- **2026-09-29, laptop DB: demo content replaced with your real resume data** (approved row by row before writing).
+  - Backup first: `~/Desktop/github/resume.db.bak-20260929-152025` (integrity `ok`).
+  - Written in one transaction: the profile row updated; experience, education, projects and skills cleared and replaced. New counts: experience 4, education 2, projects 2, skills 4. Links left unchanged (6 demo rows).
+  - Checks: integrity `ok`, and the page renders from a scratch copy with status 200, the new content, and no demo text. The render added no rows (the seeding fix works).
+  - **The VM's `data/resume.db` still has the demo data.** To update the site, repeat D1 and D3–D5 (the laptop file is the source). The expected counts are now 4/2/2/4 rather than D1's 4/16/2, and links stay at 6.
+  - Rollback: `cp ~/Desktop/github/resume.db.bak-20260929-152025 ~/Desktop/github/resume.db`.
+- **2026-09-29, live site updated to reflect the resume.**
+  - Template: the hero eyebrow changed from "Business analytics & strategy" to "Finance & ISBA", written test-first (`test_homepage_eyebrow_matches_finance_and_isba_focus`: RED, then GREEN, 10 passed). Commit `0801b8e`, merged fast-forward to `main` and pushed. The VM pulled it. No uvicorn restart was needed, because Jinja reloads changed templates.
+  - Laptop DB: the 6 demo links were replaced with 1 link (LinkedIn, from the resume). Backup first: `~/Desktop/github/resume.db.bak-20260929-152221`. Final counts: experience 4, education 2, projects 2, skills 4, links 1.
+  - VM DB, deployed with D1/D3–D5 plus two safeguards. First, the VM's old demo DB was backed up to `data/resume.db.bak-demo-20260929-222233` (mode 600). Second, the new file was uploaded as `resume.db.incoming`, hash-checked, then `mv`'d over `resume.db`, so the live app never reads a half-copied file. sha256 `88f87f89…8629` matches, integrity `ok`, counts 4/2/2/4/1.
+  - Public page `http://<VM_PUBLIC_IP>:8000/` → 200. All the new content is present. Demo strings are absent: `Alex Carter`, `Northwind`, `Rensselaer`, `example.com`, and the old eyebrow. The log has 0 errors.
+  - Leftovers on the VM: `data/resume.db.bak-demo-…` shows in `git status` as untracked (`data/*.db` doesn't match it), and `data/profile_snapshot.json` shows as modified (fact 5). Neither blocks pulls of commits that don't touch them.
+- **2026-09-29, Track record layout fix.** The live site showed the experience text squeezed into a ~1rem column, one word per line. Cause: `.timeline-item` was a `1rem 1fr` grid, but `.timeline-marker` is `position: absolute` and takes no grid cell, so the text landed in the 1rem track. Fix: removed `display: grid; gap; grid-template-columns` from `.timeline-item`. The marker and vertical line are unchanged. Checked with headless-Chrome screenshots before and after (1280px, and 500px, the narrowest headless renders) plus 10 tests passing. There's no automated test for this CSS. Commit `3d23e09`, pushed. The VM pulled it and serves the new CSS, and a live screenshot confirmed the fix. No restart was needed.
 
 ---
 
