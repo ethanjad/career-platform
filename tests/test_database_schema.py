@@ -83,3 +83,32 @@ def test_homepage_renders_cached_profile_when_db_is_down(monkeypatch):
     assert response.status_code == 200
     assert "Senior Business Analytics Student" in response.text
     assert "Profile" not in response.text or "Senior Business Analytics Student" in response.text
+
+
+def _row_counts(database_path):
+    with sqlite3.connect(database_path) as connection:
+        return {
+            table: connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in ("experience", "education", "skills", "projects", "links")
+        }
+
+
+def test_reinitializing_database_does_not_duplicate_seed_rows(tmp_path):
+    database_path = tmp_path / "resume.db"
+    initialize_database(database_path)
+    first_counts = _row_counts(database_path)
+
+    initialize_database(database_path)
+
+    assert _row_counts(database_path) == first_counts
+
+
+def test_deleted_seed_record_is_not_restored_on_next_load(tmp_path):
+    database_path = tmp_path / "resume.db"
+    initialize_database(database_path)
+    with sqlite3.connect(database_path) as connection:
+        connection.execute("DELETE FROM experience WHERE id = 1")
+
+    profile = load_public_profile(database_path)
+
+    assert [item["id"] for item in profile["experience"]] == [2]

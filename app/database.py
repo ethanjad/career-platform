@@ -124,6 +124,9 @@ def initialize_database(database_path: Path | None = None) -> None:
 
     with sqlite3.connect(path) as connection:
         connection.executescript(SCHEMA)
+        # Seed only a new database; re-seeding would duplicate rows and undo admin deletes.
+        if connection.execute("SELECT 1 FROM profile WHERE id = 1").fetchone():
+            return
         connection.execute(
             "INSERT OR IGNORE INTO profile (id, name, headline, summary, email) VALUES (1, ?, ?, ?, ?)",
             (
