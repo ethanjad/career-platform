@@ -101,12 +101,17 @@
 - **Status when paused (2026-09-29): the site is live at `http://<VM_PUBLIC_IP>:8000/`, showing the resume content. `main` = `e6181d2` plus this entry.**
   - Open items, in suggested order:
     1. F2: save `ADMIN_SECRET` to a password manager (run the command in your own terminal).
-    2. NSG review: `Temp-HTTP-8000` (8000 from `*`) and `Allow-SSH-Laptop` (22 from `<OLD_LAPTOP_IP>`) were added outside this session. Narrow or remove them as needed.
+    2. NSG review: `Temp-HTTP-8000` (8000 from `*`) and `Allow-SSH-Laptop` (22 from `<OLD_LAPTOP_IP>`) were added outside this session. Narrow or remove them as needed. (2026-09-30: `Temp-HTTP-8000` removed, see below.)
     3. uvicorn doesn't survive a reboot or deallocation. Restart it with PR1's command (`--host 0.0.0.0` to match the current state), or add a systemd unit.
     4. `.env` says `HOST=127.0.0.1`, while the running process uses `--host 0.0.0.0` (the flag wins). Align them if you want `.env` to be accurate.
     5. Fact 5: `data/profile_snapshot.json` is tracked and rewritten by the app. Consider untracking it.
     6. Cleanup: merged local branches (`chore/uv-lock`, `fix/seed-only-new-database`, `content/resume-eyebrow`, `style/track-record-width`), the laptop DB backups `~/Desktop/github/resume.db.bak-*`, and the VM backup `data/resume.db.bak-demo-*`.
   - Before resuming: re-check the laptop IP against `AllowSSHFromMyIP` (S1), and check the VM is running (S2).
+- **2026-09-30, exercise evidence and port 8000 closed.**
+  - Evidence: `docs/evidence/ex03.md` and `docs/evidence/ex03-site.png` (a headless-Chrome screenshot of `http://<VM_PUBLIC_IP>:8000/`, taken while `Temp-HTTP-8000` was open and the page returned `200`). Commit `81e4820`.
+  - Then, at your request, `Temp-HTTP-8000` was deleted. The NSG now has only `Allow-SSH-Laptop` (300) and `AllowSSHFromMyIP` (1000), both port 22. `http://<VM_PUBLIC_IP>:8000/` from the laptop → `000` (blocked). uvicorn is still running on `0.0.0.0:8000` on the VM, so reopening the port brings the site back.
+  - To reopen: `az network nsg rule create -g rg-career-platform --nsg-name vm-career-platformNSG -n Temp-HTTP-8000 --priority 310 --direction Inbound --access Allow --protocol Tcp --source-address-prefixes '*' --destination-port-ranges 8000`. To close it again: `az network nsg rule delete -g rg-career-platform --nsg-name vm-career-platformNSG -n Temp-HTTP-8000`.
+  - Open item 2 is now partly done: only `Allow-SSH-Laptop` (22 from `<OLD_LAPTOP_IP>`) remains to review.
 
 ---
 
@@ -370,6 +375,14 @@ Everything here is read-only except the SSH alias and, if the laptop IP changed,
 
 ## Section 8: Verify
 
+| Check | What it proves | Expected | Result (2026-09-29) |
+|---|---|---|---|
+| V1 | The site answers on the VM from a fresh SSH session, so uvicorn outlived the session that started it | `200` | ✅ `200` |
+| V2 | The page is rendered from the live `resume.db`, and requests add no rows (the seeding fix works) | 3 demo strings, counts 4/16/6, `snapshot rewritten`, `log clean` | ✅ all present, counts 4/16/6, `snapshot rewritten`, `log clean` |
+| V3 | CSS and templates load in a browser | page `200`, `styles.css` `200 text/css` | ✅ automated check through an SSH tunnel: `200`, `200 text/css` 5017 B. Browser check: still yours to do |
+| V4 | `.env` is loaded, so the default admin secret is rejected | `401`, counts unchanged | ✅ `401`, counts still 4/16/6 |
+| V5 | Port 8000 is not reachable from the internet | `000` / `blocked` | ✅ `000`, `blocked`. Port opened later on 2026-09-29, closed again 2026-09-30 (`000`) |
+
 - [x] **V1: The site answers on the VM (from a fresh SSH session)**
   - **Where:** VM
   - **Run:** `ssh career-vm 'curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/'`
@@ -422,6 +435,7 @@ Everything here is read-only except the SSH alias and, if the laptop IP changed,
   - **Why:** confirms the site is reachable only via the VM or the tunnel, as intended.
   - **Check:** `blocked` (or `000`).
   - **Result (2026-09-29):** `000`, then `blocked`.
+  - **Later (see Progress log):** port 8000 was made public later on 2026-09-29 (`--host 0.0.0.0` plus the `Temp-HTTP-8000` rule), then closed again on 2026-09-30. A re-check then gave `000`.
   - **Undo:** nothing to undo.
 
 ---
