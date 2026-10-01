@@ -112,6 +112,7 @@
   - Then, at your request, `Temp-HTTP-8000` was deleted. The NSG now has only `Allow-SSH-Laptop` (300) and `AllowSSHFromMyIP` (1000), both port 22. `http://<VM_PUBLIC_IP>:8000/` from the laptop → `000` (blocked). uvicorn is still running on `0.0.0.0:8000` on the VM, so reopening the port brings the site back.
   - To reopen: `az network nsg rule create -g rg-career-platform --nsg-name vm-career-platformNSG -n Temp-HTTP-8000 --priority 310 --direction Inbound --access Allow --protocol Tcp --source-address-prefixes '*' --destination-port-ranges 8000`. To close it again: `az network nsg rule delete -g rg-career-platform --nsg-name vm-career-platformNSG -n Temp-HTTP-8000`.
   - Open item 2 is now partly done: only `Allow-SSH-Laptop` (22 from `<OLD_LAPTOP_IP>`) remains to review.
+  - V3 browser check: done by you through an SSH tunnel, which was closed afterwards (see V3).
 
 ---
 
@@ -379,7 +380,7 @@ Everything here is read-only except the SSH alias and, if the laptop IP changed,
 |---|---|---|---|
 | V1 | The site answers on the VM from a fresh SSH session, so uvicorn outlived the session that started it | `200` | ✅ `200` |
 | V2 | The page is rendered from the live `resume.db`, and requests add no rows (the seeding fix works) | 3 demo strings, counts 4/16/6, `snapshot rewritten`, `log clean` | ✅ all present, counts 4/16/6, `snapshot rewritten`, `log clean` |
-| V3 | CSS and templates load in a browser | page `200`, `styles.css` `200 text/css` | ✅ automated check through an SSH tunnel: `200`, `200 text/css` 5017 B. Browser check: still yours to do |
+| V3 | CSS and templates load in a browser | page `200`, `styles.css` `200 text/css` | ✅ automated check through an SSH tunnel: `200`, `200 text/css` 5017 B. Browser check: done by you on 2026-09-30 through the tunnel |
 | V4 | `.env` is loaded, so the default admin secret is rejected | `401`, counts unchanged | ✅ `401`, counts still 4/16/6 |
 | V5 | Port 8000 is not reachable from the internet | `000` / `blocked` | ✅ `000`, `blocked`. Port opened later on 2026-09-29, closed again 2026-09-30 (`000`) |
 
@@ -415,6 +416,7 @@ Everything here is read-only except the SSH alias and, if the laptop IP changed,
   - **Why:** visual check that CSS and templates load, without opening a public port.
   - **Check:** the styled resume page shows your profile, experience, projects, skills and links.
   - **Result (2026-09-29):** automated part only. Through `ssh -f -N -L 8000:127.0.0.1:8000 career-vm`, `/` → `200` with title `Alex Carter | Senior Business Analytics Student`, and `/static/styles.css` → `200 text/css`, 5017 B. The tunnel was closed afterwards. **The visual check in your browser is still for you to do.**
+  - **Browser check (2026-09-30):** done. A tunnel was opened with `ssh -N -L 8000:127.0.0.1:8000 career-vm` (`/` → `200`, `/static/styles.css` → `200 text/css`), you checked the page at `http://localhost:8000`, and the tunnel was then closed (local port 8000 free).
   - **Undo:** press Ctrl-C in the tunnel terminal.
 
 - [x] **V4: The admin API rejects the default secret**
