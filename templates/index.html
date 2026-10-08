@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ profile.summary }}">
-    <title>{{ profile.name }} | {{ profile.headline }}</title>
+    <title>{{ profile.name }} | {{ profile.headline.split(' · ')[0] }}</title>
+    <link rel="preload" href="{{ url_for('static', path='fonts/schibsted-grotesk-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
   </head>
   <body>
@@ -12,8 +13,8 @@
       <div class="shell nav">
         <a class="brand" href="#top">{{ profile.name }}</a>
         <nav aria-label="Primary navigation">
-          <a href="#experience">Experience</a>
-          <a href="#projects">Projects</a>
+          {% if profile.experience %}<a href="#experience">Experience</a>{% endif %}
+          {% if profile.projects %}<a href="#projects">Projects</a>{% endif %}
           <a href="#contact">Contact</a>
         </nav>
       </div>
@@ -22,94 +23,103 @@
     <main id="top">
       <section class="hero shell">
         <div class="hero-copy">
-          <p class="eyebrow">Finance &amp; ISBA</p>
           <h1>{{ profile.name }}</h1>
-          <p class="headline">{{ profile.headline }}</p>
+          <ul class="facts">
+            {% for fact in profile.headline.split(' · ') if fact.strip() %}
+            <li>{{ fact }}</li>
+            {% endfor %}
+          </ul>
           <p class="lede">{{ profile.summary }}</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="mailto:{{ profile.email }}">Get in touch</a>
-            <a class="button button-secondary" href="#projects">View selected work</a>
+            {% if resume_available %}
+            <a class="button button-primary" href="{{ url_for('resume_pdf') }}" download>Download résumé <span class="button-note">PDF</span></a>
+            {% endif %}
+            <a class="button {{ 'button-secondary' if resume_available else 'button-primary' }}" href="mailto:{{ profile.email }}">Email me</a>
+            {% for link in profile.links if link.label | lower == 'linkedin' %}
+            <a class="button button-secondary" href="{{ link.url }}" target="_blank" rel="noreferrer">LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a>
+            {% endfor %}
           </div>
         </div>
-        <aside class="availability" aria-label="Contact details">
-          <span class="status-dot"></span>
-          <div>
-            <strong>Open to opportunities</strong>
-            <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
-          </div>
-        </aside>
+        {% set current = namespace(item=none) %}
+        {% for item in profile.experience if current.item is none and 'Present' in item.details %}
+        {% set current.item = item %}
+        {% endfor %}
+        {% if current.item %}
+        <p class="now">
+          <span class="now-label">Currently</span>
+          <strong>{{ current.item.title }}</strong>
+          {{ current.item.company }}
+        </p>
+        {% endif %}
       </section>
 
       <div class="shell content-grid">
         <div class="main-column">
+          {% if profile.experience %}
           <section id="experience" class="section">
             <div class="section-heading">
-              <p class="eyebrow">Track record</p>
               <h2>Experience</h2>
             </div>
             {% for item in profile.experience %}
+            {% set dates, body = item.details | split_dates %}
             <article class="timeline-item">
               <div class="timeline-marker" aria-hidden="true"></div>
-              <div>
-                <p class="item-kicker">{{ item.company }}</p>
+              <div class="role">
                 <h3>{{ item.title }}</h3>
-                <p>{{ item.details }}</p>
+                {% if dates %}<p class="role-dates">{{ dates }}</p>{% endif %}
+                <p class="role-org">{{ item.company }}</p>
+                {% if body %}<p class="role-body">{{ body }}</p>{% endif %}
               </div>
             </article>
-            {% else %}
-            <p class="muted">Professional experience will be added soon.</p>
             {% endfor %}
           </section>
+          {% endif %}
 
+          {% if profile.projects %}
           <section id="projects" class="section">
             <div class="section-heading">
-              <p class="eyebrow">Selected work</p>
-              <h2>Projects</h2>
+              <h2>Projects &amp; Involvement</h2>
             </div>
             <div class="project-grid">
               {% for project in profile.projects %}
               <article class="card project-card">
-                <span class="card-number">0{{ loop.index }}</span>
                 <h3>{{ project.title }}</h3>
                 <p>{{ project.summary }}</p>
               </article>
-              {% else %}
-              <p class="muted">Project case studies will be added soon.</p>
               {% endfor %}
             </div>
           </section>
+          {% endif %}
         </div>
 
         <aside class="side-column">
+          {% if profile.skills %}
           <section id="skills" class="section compact-section">
             <div class="section-heading">
-              <p class="eyebrow">Capabilities</p>
               <h2>Skills</h2>
             </div>
             <div class="skill-list">
               {% for skill in profile.skills %}
               <span class="skill">{{ skill.name }}</span>
-              {% else %}
-              <p class="muted">Skills will be added soon.</p>
               {% endfor %}
             </div>
           </section>
+          {% endif %}
 
+          {% if profile.education %}
           <section id="education" class="section compact-section">
             <div class="section-heading">
-              <p class="eyebrow">Foundation</p>
               <h2>Education</h2>
             </div>
             {% for item in profile.education %}
             <article class="education-item">
               <h3>{{ item.school }}</h3>
               <p><strong>{{ item.degree }}</strong> · {{ item.field }}</p>
-              <p>{{ item.details }}</p>
+              <p>{% for part in item.details.split(' · ') %}<span>{{ part }}</span>{{ ' · ' if not loop.last }}{% endfor %}</p>
             </article>
-            {% else %}
-            <p class="muted">Education details will be added soon.</p>
             {% endfor %}
           </section>
+          {% endif %}
         </aside>
       </div>
     </main>
@@ -117,13 +127,15 @@
     <footer id="contact" class="footer">
       <div class="shell footer-inner">
         <div>
-          <p class="eyebrow">Let’s connect</p>
-          <h2>Have a role or project in mind?</h2>
+          <h2>Hiring an intern in analytics, finance, or sports business?</h2>
           <a class="footer-email" href="mailto:{{ profile.email }}">{{ profile.email }}</a>
         </div>
         <div class="links" aria-label="Professional links">
+          {% if resume_available %}
+          <a href="{{ url_for('resume_pdf') }}" download>Résumé (PDF)</a>
+          {% endif %}
           {% for link in profile.links %}
-          <a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} <span aria-hidden="true">↗</span></a>
+          <a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
           {% endfor %}
         </div>
       </div>
