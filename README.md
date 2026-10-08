@@ -1,6 +1,6 @@
 # Career Platform
 
-A recruiter-facing FastAPI, Jinja, and SQLite resume site.
+A recruiter-facing FastAPI, Jinja, and PostgreSQL résumé site (SQLite for local development).
 
 ## Run in Codespaces
 
@@ -12,7 +12,7 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Open port 8000. SQLite is initialized with seed profile content on first request.
+Open port 8000. Without `DATABASE_URL`, a local SQLite database is created and seeded with demo profile content when the app starts.
 
 ## Admin updates
 
@@ -29,18 +29,24 @@ curl -X POST http://127.0.0.1:8000/admin/projects \
 ## Database fallback
 
 After a successful database read or admin write, the app stores the last
-known-good public profile in `data/profile_snapshot.json`. If SQLite is
+known-good public profile in `data/profile_snapshot.json`. If the database is
 unavailable, the public page serves that snapshot instead of a blank or error
 page. Keep this snapshot available in the deployed application.
 
-## Azure VM path
+## Deploying on Railway
 
-On an Azure VM, install Python and the requirements, set the environment
-variables, and run:
+The `web` service deploys `main` with `railway.json` (start: `start.sh`,
+healthcheck: `/healthz`). It needs two variables:
+
+- `DATABASE_URL` = `${{Postgres.DATABASE_URL}}` (Railway reference variable)
+- `ADMIN_SECRET` = a long random string
+
+To copy data between databases (keeps ids, refuses to overwrite unless
+`--replace`):
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uv run python -m scripts.copy_database SOURCE_URL TARGET_URL
 ```
 
-For production, run Uvicorn under a process supervisor and allow the chosen
-port in the VM network security group.
+Run the tests against Postgres by pointing `TEST_DATABASE_URL` at a
+throwaway database whose name contains `test`.
