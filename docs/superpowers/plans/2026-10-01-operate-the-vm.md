@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Visitors reach the site at `http://135.225.24.52/`. The app starts on boot, restarts itself after a crash, runs as `azureuser`, and port 8000 stays private.
+**Goal:** Visitors reach the site at `http://135.225.24.52/`. *(Superseded 2026-10-06: Certbot made the site HTTPS-only at `https://ethanjad.me/` and `https://www.ethanjad.me/`. `http://135.225.24.52/` now returns `404`; see the 2026-10-08 Progress log entry.)* The app starts on boot, restarts itself after a crash, runs as `azureuser`, and port 8000 stays private.
 
 **Architecture:** A systemd service named `career-platform` runs uvicorn with 2 worker processes on `127.0.0.1:8000`. nginx listens on public port 80 and passes each request to `127.0.0.1:8000`. The Azure firewall (NSG) allows port 80 and has no rule for port 8000.
 
@@ -19,6 +19,7 @@
 | Public IP | `135.225.24.52` (no DNS name) |
 | SSH | `ssh career-vm`, which is `azureuser@135.225.24.52` with key `~/.ssh/isba4775_azure`. Password login is off. |
 | NSG `vm-career-platformNSG` | `Allow-SSH-Laptop` (300, port 22, old laptop IP), **`Allow-HTTP-80` (310, port 80, from anyone)**, `AllowSSHFromMyIP` (1000, port 22, current laptop IP). There is no rule for port 8000. |
+| NSG as of 2026-10-08 | `Allow-SSH-Laptop` (300, port 22, from `135.225.24.52/32` and `157.242.208.11/32`), `Allow-HTTP-80` (310, port 80, `*`), `Allow-HTTPS-443` (320, port 443, `*`), `AllowSSHFromMyIP` (1000, port 22, `162.231.193.100/32`). Still no rule for port 8000. |
 | App on the VM | Code is in `/home/azureuser/career-platform`, the Python environment is `.venv/`, the database is `data/resume.db`, and secrets are in `.env`. Right now uvicorn is started by hand (`nohup setsid`) on `0.0.0.0:8000`. |
 
 **Note:** an `Allow-HTTP-80` rule already exists, at priority **310** rather than the 320 you planned. Task 3 checks that rule instead of creating it. If you'd rather have it at 320, change its priority in the portal. Don't add a second rule with the same name.
@@ -47,6 +48,17 @@ _(Add dated results here as each step runs.)_
 - **2026-10-01, Task 1 done.** The hand-started uvicorn is stopped. The `career-platform` service is enabled and active, running as `azureuser` with 2 workers on `127.0.0.1:8000`. All Step 4 checks matched. Details are under Task 1.
 - **2026-10-01, Task 2 done.** nginx 1.24.0 is installed. It serves the site on port 80 of the VM and passes requests to `127.0.0.1:8000`. The Ubuntu default page is turned off, and an auto-restart setting is added. All Step 4 checks matched. Details are under Task 2.
 - **2026-10-01, Task 3 done. All tasks are complete.** From the laptop, `http://135.225.24.52/` returns `200` with the real resume page and port 8000 is blocked. The site is served by nginx on port 80 and the `career-platform` service on `127.0.0.1:8000`. Both start at boot, both restart after a crash, and the app runs as `azureuser`. Still to do (by you): the crash and reboot tests (see Known limits). Also worth a look: `Allow-SSH-Laptop` now allows the VM's own IP (see Task 3).
+- **2026-10-08, deploy of `0508faf` (recruiter-first homepage).**
+  - SSH from the laptop timed out because the laptop IP had changed. With the owner's OK, `AllowSSHFromMyIP` went from `157.242.208.233/32` to `162.231.193.100/32` (replaced, not added). No other rule changed.
+  - On the VM, these backups were made before the pull: `data/resume.db.bak-predeploy-20261008-045830` and `~/profile_snapshot.json.bak-predeploy-20261008-045830`.
+  - `git pull --ff-only origin main` went from `3d23e09` to `0508faf`, then `sudo systemctl restart career-platform`. The service came back `active` with no errors in the journal.
+  - Left untouched: `.env`, `data/resume.db`, the VM's live `data/profile_snapshot.json`, nginx, Certbot/HTTPS and DNS.
+  - Checks from the laptop:
+    - `https://ethanjad.me/` and `https://www.ethanjad.me/` return `200`.
+    - `http://ethanjad.me/` returns `301` to HTTPS.
+    - The new font is served over HTTPS.
+  - New route `/resume.pdf`: it serves `data/resume.pdf`, which must be a web-safe export with no phone or address. Until that file exists, the route returns `404` with a contact message, and the page hides the résumé button.
+  - Still worth a look: `Allow-SSH-Laptop` (300) allows `135.225.24.52/32` (the VM's own IP) and `157.242.208.11/32`. Neither is the current laptop IP.
 
 ---
 
