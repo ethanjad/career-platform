@@ -36,7 +36,7 @@ He is a dual Finance and ISBA (Information Systems & Business Analytics) student
 - Phone number and street address never appear on the public site. Email and LinkedIn are the only public contact channels.
 - The PDF résumé is the canonical source of facts (dates, GPA, titles). The site must match it and offers it as a download. The public download is a separate web-safe export (no phone or address) at `data/resume.pdf` on the server (`RESUME_PDF_PATH`), served at `/resume.pdf`. The button appears only when that file exists.
 - ISBA is spelled out as "Information Systems & Business Analytics" for recruiters (user-confirmed 2026-10-07).
-- Show the graduation year publicly but no target internship term (user decision, 2026-10-07). The year itself is unconfirmed: the PDF shows LMU Aug 2023–present, so likely 2027.
+- Show the graduation year publicly (Class of 2027, user-confirmed 2026-10-08) but no target internship term (user decision, 2026-10-07).
 - Open: whether experience gets structured date/location fields in the DB schema (dates currently sit inside free-text details).
 
 ## Brand Commitments
