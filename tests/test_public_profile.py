@@ -4,8 +4,13 @@ from app.database import initialize_database, load_public_profile
 from app.main import app
 
 
-def test_public_profile_exposes_all_content_sections(tmp_path):
-    profile = load_public_profile(tmp_path / "resume.db")
+def seeded_profile():
+    initialize_database()
+    return load_public_profile()
+
+
+def test_public_profile_exposes_all_content_sections():
+    profile = seeded_profile()
 
     assert profile["experience"]
     assert profile["education"]
@@ -15,15 +20,8 @@ def test_public_profile_exposes_all_content_sections(tmp_path):
     assert profile["settings"]["site_title"] == "Career Platform"
 
 
-def test_homepage_renders_every_recruiter_facing_section(monkeypatch, tmp_path):
-    database_path = tmp_path / "resume.db"
-    initialize_database(database_path)
-    monkeypatch.setenv("DATABASE_PATH", str(database_path))
-
-    # The application settings are initialized at import time, so use the
-    # profile loader directly to make this test independent of the process DB.
-    profile = load_public_profile(database_path)
-    monkeypatch.setattr("app.main.get_profile", lambda: profile)
+def test_homepage_renders_every_recruiter_facing_section():
+    initialize_database()
 
     response = TestClient(app).get("/")
 
@@ -34,8 +32,8 @@ def test_homepage_renders_every_recruiter_facing_section(monkeypatch, tmp_path):
     assert "Revenue Trend Dashboard" in response.text
 
 
-def test_homepage_hero_renders_headline_as_fact_row(monkeypatch, tmp_path):
-    profile = load_public_profile(tmp_path / "resume.db")
+def test_homepage_hero_renders_headline_as_fact_row(monkeypatch):
+    profile = seeded_profile()
     profile["headline"] = "BBA Finance & ISBA · Loyola Marymount University · GPA 3.62"
     profile["experience"][0]["details"] = "Jun 2026 – Present. Budgeting work."
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
@@ -49,8 +47,8 @@ def test_homepage_hero_renders_headline_as_fact_row(monkeypatch, tmp_path):
     assert "<title>Alex Carter | BBA Finance &amp; ISBA</title>" in response.text
 
 
-def test_homepage_hides_current_role_when_none_is_ongoing(monkeypatch, tmp_path):
-    profile = load_public_profile(tmp_path / "resume.db")
+def test_homepage_hides_current_role_when_none_is_ongoing(monkeypatch):
+    profile = seeded_profile()
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
 
     response = TestClient(app).get("/")
@@ -74,7 +72,7 @@ def _use_resume_pdf(monkeypatch, path):
 
 
 def test_resume_button_and_route_appear_only_when_pdf_exists(monkeypatch, tmp_path):
-    profile = load_public_profile(tmp_path / "resume.db")
+    profile = seeded_profile()
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
     pdf = tmp_path / "resume.pdf"
     _use_resume_pdf(monkeypatch, pdf)
@@ -93,8 +91,8 @@ def test_resume_button_and_route_appear_only_when_pdf_exists(monkeypatch, tmp_pa
     assert "Download résumé" in client.get("/").text
 
 
-def test_empty_sections_are_hidden_instead_of_promising_content(monkeypatch, tmp_path):
-    profile = load_public_profile(tmp_path / "resume.db")
+def test_empty_sections_are_hidden_instead_of_promising_content(monkeypatch):
+    profile = seeded_profile()
     profile["projects"] = []
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
 

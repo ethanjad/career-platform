@@ -1,16 +1,33 @@
+import logging
 import re
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from .config import get_settings
-from .database import get_profile
+from .database import get_engine, get_profile, initialize_database
 from .admin import delete_record, save_record
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
-app = FastAPI(title=settings.app_name)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # A database outage must not stop the site from serving its snapshot.
+    try:
+        initialize_database()
+    except SQLAlchemyError:
+        logger.exception("Database initialization failed; serving the snapshot until it recovers")
+    yield
+
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 templates = Jinja2Templates(directory=settings.templates_dir)
 
@@ -46,6 +63,16 @@ def resume_pdf():
         )
     filename = f"{profile['name'].replace(' ', '-')}-Resume.pdf"
     return FileResponse(settings.resume_pdf_path, media_type="application/pdf", filename=filename)
+
+
+@app.get("/healthz", include_in_schema=False)
+def healthz():
+    try:
+        with get_engine().connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        return PlainTextResponse("database unavailable", status_code=503)
+    return PlainTextResponse("ok")
 
 
 def require_admin(secret: str | None) -> None:

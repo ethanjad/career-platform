@@ -223,3 +223,4 @@ data/*.db
 # Personal documents (resume PDFs contain phone/address) and macOS metadata
 *.pdf
 .DS_Store
+!data/resume.pdf
