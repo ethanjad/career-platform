@@ -50,3 +50,12 @@ uv run python -m scripts.copy_database SOURCE_URL TARGET_URL
 
 Run the tests against Postgres by pointing `TEST_DATABASE_URL` at a
 throwaway database whose name contains `test`.
+
+## Project 1 evidence
+
+See [docs/project-1-submission.md](docs/project-1-submission.md) for the full
+list. Exercise write-ups:
+
+- [Exercise 03: Azure VM deployment](docs/evidence/ex03.md)
+- [Exercise 05: DNS failure investigation (simulation)](docs/evidence/ex05.md)
+- [How this site is secured (HTTPS)](docs/how-this-site-is-secured.md)
