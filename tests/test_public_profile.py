@@ -113,3 +113,13 @@ def test_privacy_page_is_linked_from_the_footer_and_names_google_analytics():
     assert "<h1>Privacy</h1>" in response.text
     assert "Google Analytics" in response.text
     assert "_ga_1DG579DN36" in response.text
+
+
+def test_google_tag_loads_exactly_once_on_every_html_page():
+    initialize_database()
+    client = TestClient(app)
+
+    for path in ("/", "/privacy"):
+        html = client.get(path).text
+        assert html.count("googletagmanager.com/gtag/js?id=G-1DG579DN36") == 1, path
+        assert html.count("gtag('config', 'G-1DG579DN36')") == 1, path
