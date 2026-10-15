@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="What this site collects, why, who receives it, and your choices.">
+    <title>Privacy | {{ profile.name }}</title>
+    <link rel="preload" href="{{ url_for('static', path='fonts/schibsted-grotesk-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell nav">
+        <a class="brand" href="{{ url_for('resume') }}">{{ profile.name }}</a>
+      </div>
+    </header>
+
+    <main class="shell prose">
+      <h1>Privacy</h1>
+      <p class="updated">Last updated October 15, 2026</p>
+
+      <p>This is my personal résumé site. It has no accounts, no forms and no comments, and I don't sell or share visitor data for advertising. The site itself sets no cookies. The only tracking on it is Google Analytics, which I use to count visits and see which links people follow.</p>
+
+      <h2>What Google Analytics collects</h2>
+      <p>When you open a page, a script from Google loads and sends Google information about the visit:</p>
+      <ul>
+        <li>the page you viewed, its title, and the page or site that sent you here</li>
+        <li>your browser, operating system, device type, screen size and language</li>
+        <li>your approximate location (city, region and country), which Google works out from your IP address</li>
+        <li>the time of the visit and how long you stayed</li>
+        <li>a random ID stored in a cookie, so that repeat visits from the same browser can be counted as one visitor</li>
+      </ul>
+      <p>When you click a link that leaves this site, such as my LinkedIn profile, Google Analytics also records the address of that link.</p>
+      <p>Your browser sends your IP address to Google as part of every request. <a href="https://support.google.com/analytics/answer/12017362" target="_blank" rel="noreferrer">Google says</a> that Google Analytics 4 doesn't log or store IP addresses. I can't check that myself.</p>
+
+      <h2>Cookies</h2>
+      <p>Google Analytics stores two cookies in your browser for this site:</p>
+      <ul>
+        <li><strong>_ga</strong> holds the random visitor ID.</li>
+        <li><strong>_ga_1DG579DN36</strong> keeps track of your current visit.</li>
+      </ul>
+      <p>Both expire two years after your last visit, unless you delete them sooner. No other cookies are set.</p>
+
+      <h2>Why I collect it</h2>
+      <p>I use it to see how many people visit, where they come from, and whether they click through to my profiles. That tells me whether my applications and links are working. I don't use it to identify individual visitors, and I don't see names or contact details in Google Analytics.</p>
+
+      <h2>Who receives it</h2>
+      <ul>
+        <li><strong>Google</strong> receives the Google Analytics data and processes it on its servers, which may be outside your country, including in the United States. Its use of the data is covered by the <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google Privacy Policy</a> and <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noreferrer">How Google uses information from sites that use its services</a>.</li>
+        <li><strong>Railway</strong>, which hosts the site, keeps technical server logs of requests, such as the IP address, the page requested and the time. I only look at these to fix problems with the site.</li>
+        {% if profile.email.endswith('@gmail.com') %}
+        <li><strong>Google (Gmail)</strong> handles my email. If you email me, your message and address are kept in my inbox.</li>
+        {% elif profile.email.endswith('@ethanjad.me') %}
+        <li><strong>Zoho</strong> handles my email. If you email me, your message and address are kept in my inbox.</li>
+        {% endif %}
+      </ul>
+      <p>Google Analytics keeps visitor-level data for 2 months before deleting it. The visit totals I see in my reports are kept longer.</p>
+
+      <h2>Your choices</h2>
+      <p>This site doesn't currently show a consent banner, and it doesn't respond to "Do Not Track" or Global Privacy Control signals. The ways to opt out are on your end:</p>
+      <ul>
+        <li>Install Google's <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noreferrer">Google Analytics opt-out browser add-on</a>.</li>
+        <li>Use a content blocker or a browser with tracking protection. Most of them block Google Analytics.</li>
+        <li>Block or delete cookies for this site in your browser settings. Page views are still sent, but each visit then looks like a new visitor.</li>
+        <li>Turn off JavaScript. The site works without it.</li>
+      </ul>
+      <p>Links from this site to LinkedIn and other sites don't tell those sites which page you came from.</p>
+      <p>If you'd like your Google Analytics data deleted, email me the value of your <strong>_ga</strong> cookie and I'll ask Google Analytics to delete the data tied to it. Without that value, I have no way to pick out your visits.</p>
+
+      <h2>Questions</h2>
+      <p>Email me at <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>. If I change what this site collects, I'll update this page and the date at the top.</p>
+    </main>
+
+    <footer class="footer footer-simple">
+      <div class="shell links">
+        <a href="{{ url_for('resume') }}">← Back to résumé</a>
+      </div>
+    </footer>
+  </body>
+</html>

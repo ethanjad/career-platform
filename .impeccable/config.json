@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "templates/privacy.html"
+        ],
+        "createdAt": "2026-10-15T21:54:45.088Z",
+        "reason": "Claude triage: .prose sets h1 clamp(2.5rem,6vw,3.75rem), h2 1.5rem, body 1rem — steps of 1.5x and >=1.67x; detector likely not resolving .prose overrides/clamp"
+      }
+    ]
+  }
+}

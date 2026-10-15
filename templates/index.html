@@ -137,6 +137,7 @@
           {% for link in profile.links %}
           <a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
           {% endfor %}
+          <a href="{{ url_for('privacy') }}">Privacy</a>
         </div>
       </div>
     </footer>

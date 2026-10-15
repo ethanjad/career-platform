@@ -101,3 +101,15 @@ def test_empty_sections_are_hidden_instead_of_promising_content(monkeypatch):
     assert 'id="projects"' not in response.text
     assert 'href="#projects"' not in response.text
     assert "added soon" not in response.text
+
+
+def test_privacy_page_is_linked_from_the_footer_and_names_google_analytics():
+    initialize_database()
+    client = TestClient(app)
+
+    assert 'href="http://testserver/privacy"' in client.get("/").text
+    response = client.get("/privacy")
+    assert response.status_code == 200
+    assert "<h1>Privacy</h1>" in response.text
+    assert "Google Analytics" in response.text
+    assert "_ga_1DG579DN36" in response.text

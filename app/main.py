@@ -53,6 +53,11 @@ def resume(request: Request):
     )
 
 
+@app.get("/privacy", name="privacy")
+def privacy(request: Request):
+    return templates.TemplateResponse(request=request, name="privacy.html", context={"profile": get_profile()})
+
+
 @app.get("/resume.pdf", name="resume_pdf")
 def resume_pdf():
     profile = get_profile()

@@ -104,6 +104,15 @@ h3 { font-size: 1.125rem; font-weight: 700; letter-spacing: -.01em; line-height:
 .links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
 .links a { color: #b9c2d4; }
 
+.prose { max-width: 68ch; padding-block: clamp(3rem, 7vw, 5rem) 6rem; }
+.prose h1 { font-size: clamp(2.5rem, 6vw, 3.75rem); }
+.prose h2 { font-size: 1.5rem; margin: 3rem 0 .75rem; }
+.prose ul { padding-left: 1.25rem; }
+.prose li + li { margin-top: .4rem; }
+.prose a { color: var(--accent); }
+.updated { color: var(--muted); font-size: .9rem; }
+.footer-simple { padding-block: 2.5rem; }
+
 @media (max-width: 700px) {
   .shell { width: min(100% - 2rem, 1120px); }
   .nav { min-height: 62px; }
