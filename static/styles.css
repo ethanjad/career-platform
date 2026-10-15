@@ -53,7 +53,7 @@ h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 h1 { font-size: clamp(3.25rem, 8vw, 6rem); font-weight: 750; letter-spacing: -.04em; line-height: .95; margin-bottom: 1.25rem; }
 h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 750; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 1.5rem; }
-h3 { font-size: 1.125rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; margin-bottom: .2rem; }
+h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; margin-bottom: .2rem; }
 /* Each fact carries its own left rule; the list is shifted left and clipped so a rule never starts a line, however it wraps. */
 .facts { clip-path: inset(0 0 0 calc(.9rem + 1px)); display: flex; flex-wrap: wrap; font-size: clamp(1.05rem, 1.9vw, 1.35rem); font-weight: 650; letter-spacing: -.01em; line-height: 1.3; list-style: none; margin: 0 0 1.25rem calc(-.9rem - 1px); padding: 0; row-gap: .5rem; }
 .facts li { border-left: 1px solid var(--line); padding-inline: .9rem; }
