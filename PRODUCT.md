@@ -8,11 +8,11 @@ web
 
 ## Users
 
-Internship recruiters and hiring managers screening Ethan Jad, an LMU undergraduate. They reach ethanjad.me from LinkedIn, an application, or an email signature, and they skim for 30 to 60 seconds. They want to know who he is, what he studies, when he graduates, what he has done, and how to contact him or get the résumé.
+Recruiters and hiring managers filling full-time, entry-level roles who are screening Ethan Jad, an LMU senior graduating in May 2027. They reach ethanjad.me from LinkedIn, an application, or an email signature, and they skim for 30 to 60 seconds. They want to know who he is, what he studies, when he graduates, what he has done, and how to contact him or get the résumé.
 
 ## Product Purpose
 
-A recruiter-facing résumé site for Ethan Jad. It should get him interviews for internships in:
+A recruiter-facing résumé site for Ethan Jad. It should get him interviews for full-time roles, starting after his May 2027 graduation, in:
 
 - business analytics / data (SQL, Python, Excel; the ISBA side)
 - finance (budgeting, FP&A, corporate finance)
@@ -36,7 +36,7 @@ He is a dual Finance and ISBA (Information Systems & Business Analytics) student
 - Phone number and street address never appear on the public site. Email and LinkedIn are the only public contact channels.
 - The PDF résumé is the canonical source of facts (dates, GPA, titles). The site must match it and offers it as a download. The public download is a separate web-safe export (no phone or address) at `data/resume.pdf` on the server (`RESUME_PDF_PATH`), served at `/resume.pdf`. The button appears only when that file exists.
 - ISBA is spelled out as "Information Systems & Business Analytics" for recruiters (user-confirmed 2026-10-07).
-- Show the graduation year publicly (Class of 2027, user-confirmed 2026-10-08) but no target internship term (user decision, 2026-10-07).
+- Show the graduation date publicly (May 2027; Class of 2027 user-confirmed 2026-10-08). The site targets full-time roles, not internships (user decision, 2026-10-19). The footer says so: "Seeking full-time opportunities in analytics, finance, and sports business following my May 2027 graduation."
 - Open: whether experience gets structured date/location fields in the DB schema (dates currently sit inside free-text details).
 
 ## Brand Commitments

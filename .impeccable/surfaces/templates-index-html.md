@@ -8,7 +8,7 @@ related_targets: ["templates/privacy.html"]
 # Surface brief: ethanjad.me homepage
 
 Scope: templates/index.html (+ shared header/footer/prose styles used by templates/privacy.html). Mode: Persuade.
-Audience: internship recruiters skimming 30–60s. Action: email, résumé PDF, LinkedIn. Proof: DB content only (PDF is truth). Constraints: no phone/address; DB-driven sections must degrade when empty/long; preserve routes, backend, DB, env, hosting (Railway).
+Audience: recruiters filling full-time, entry-level roles (May 2027 grad), skimming 30–60s. Action: email, résumé PDF, LinkedIn. Proof: DB content only (PDF is truth). Constraints: no phone/address; DB-driven sections must degrade when empty/long; preserve routes, backend, DB, env, hosting (Railway).
 Chosen direction: Season Ticket (round 2). Memorable moment: the hero is one perforated game-day ticket with a tear-off stub of facts.
 Unresolved: lede copy and ISBA spelling live in the DB (user's call); credentials not yet in DB.
 
