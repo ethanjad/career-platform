@@ -36,7 +36,7 @@ He is a dual Finance and ISBA (Information Systems & Business Analytics) student
 - Phone number and street address never appear on the public site. Email and LinkedIn are the only public contact channels.
 - The PDF résumé is the canonical source of facts (dates, GPA, titles). The site must match it and offers it as a download. The public download is a separate web-safe export (no phone or address) at `data/resume.pdf` on the server (`RESUME_PDF_PATH`), served at `/resume.pdf`. The button appears only when that file exists.
 - ISBA is spelled out as "Information Systems & Business Analytics" for recruiters (user-confirmed 2026-10-07).
-- Show the graduation date publicly (May 2027; Class of 2027 user-confirmed 2026-10-08). The site targets full-time roles, not internships (user decision, 2026-10-19). The footer says so: "Seeking full-time opportunities in analytics, finance, and sports business following my May 2027 graduation."
+- Show the graduation date publicly (May 2027; Class of 2027 user-confirmed 2026-10-08). The site targets full-time roles, not internships (user decision, 2026-10-19). The footer says so: "Seeking full-time roles in analytics, finance, and sports business from May 2027."
 - Open: whether experience gets structured date/location fields in the DB schema (dates currently sit inside free-text details).
 
 ## Brand Commitments
