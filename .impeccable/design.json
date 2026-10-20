@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T00:00:00Z",
+  "title": "Design System: Ethan Jad",
+  "extensions": {
+    "colorMeta": {
+      "navy": { "role": "primary", "displayName": "LMU Navy", "canonical": "#00285e", "tonalRamp": ["oklch(15% 0.106 257.7)", "oklch(26% 0.106 257.7)", "oklch(37% 0.106 257.7)", "oklch(48% 0.106 257.7)", "oklch(59% 0.106 257.7)", "oklch(70% 0.106 257.7)", "oklch(82% 0.106 257.7)", "oklch(95% 0.030 257.7)"] },
+      "crimson": { "role": "secondary", "displayName": "LMU Crimson", "canonical": "#ab0c2f", "tonalRamp": ["oklch(15% 0.184 19.1)", "oklch(26% 0.184 19.1)", "oklch(37% 0.184 19.1)", "oklch(48% 0.184 19.1)", "oklch(59% 0.184 19.1)", "oklch(70% 0.184 19.1)", "oklch(82% 0.184 19.1)", "oklch(95% 0.030 19.1)"] },
+      "crimson-deep": { "role": "secondary", "displayName": "Crimson Ink", "canonical": "#8a0925", "tonalRamp": ["oklch(15% 0.157 18.8)", "oklch(26% 0.157 18.8)", "oklch(37% 0.157 18.8)", "oklch(48% 0.157 18.8)", "oklch(59% 0.157 18.8)", "oklch(70% 0.157 18.8)", "oklch(82% 0.157 18.8)", "oklch(95% 0.030 18.8)"] },
+      "ground": { "role": "neutral", "displayName": "Counter Grey-Blue", "canonical": "#eef1f6", "tonalRamp": ["oklch(15% 0.007 260.7)", "oklch(26% 0.007 260.7)", "oklch(37% 0.007 260.7)", "oklch(48% 0.007 260.7)", "oklch(59% 0.007 260.7)", "oklch(70% 0.007 260.7)", "oklch(82% 0.007 260.7)", "oklch(95% 0.007 260.7)"] },
+      "paper": { "role": "neutral", "displayName": "Ticket Stock", "canonical": "#ffffff", "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(37% 0 0)", "oklch(48% 0 0)", "oklch(59% 0 0)", "oklch(70% 0 0)", "oklch(82% 0 0)", "oklch(95% 0 0)"] },
+      "ink": { "role": "neutral", "displayName": "Night Ink", "canonical": "#0f1c33", "tonalRamp": ["oklch(15% 0.049 261.1)", "oklch(26% 0.049 261.1)", "oklch(37% 0.049 261.1)", "oklch(48% 0.049 261.1)", "oklch(59% 0.049 261.1)", "oklch(70% 0.049 261.1)", "oklch(82% 0.049 261.1)", "oklch(95% 0.030 261.1)"] },
+      "muted": { "role": "neutral", "displayName": "Slate Fine Print", "canonical": "#535d70", "tonalRamp": ["oklch(15% 0.033 263.2)", "oklch(26% 0.033 263.2)", "oklch(37% 0.033 263.2)", "oklch(48% 0.033 263.2)", "oklch(59% 0.033 263.2)", "oklch(70% 0.033 263.2)", "oklch(82% 0.033 263.2)", "oklch(95% 0.030 263.2)"] },
+      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "#d3dae6", "tonalRamp": ["oklch(15% 0.018 261.3)", "oklch(26% 0.018 261.3)", "oklch(37% 0.018 261.3)", "oklch(48% 0.018 261.3)", "oklch(59% 0.018 261.3)", "oklch(70% 0.018 261.3)", "oklch(82% 0.018 261.3)", "oklch(95% 0.018 261.3)"] },
+      "perf": { "role": "neutral", "displayName": "Perforation Grey", "canonical": "#9aa6bb", "tonalRamp": ["oklch(15% 0.033 261.7)", "oklch(26% 0.033 261.7)", "oklch(37% 0.033 261.7)", "oklch(48% 0.033 261.7)", "oklch(59% 0.033 261.7)", "oklch(70% 0.033 261.7)", "oklch(82% 0.033 261.7)", "oklch(95% 0.030 261.7)"] },
+      "on-navy": { "role": "neutral", "displayName": "On-Navy White", "canonical": "#ffffff", "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(37% 0 0)", "oklch(48% 0 0)", "oklch(59% 0 0)", "oklch(70% 0 0)", "oklch(82% 0 0)", "oklch(95% 0 0)"] },
+      "on-navy-muted": { "role": "neutral", "displayName": "On-Navy Haze", "canonical": "#c3d0ee", "tonalRamp": ["oklch(15% 0.044 266.9)", "oklch(26% 0.044 266.9)", "oklch(37% 0.044 266.9)", "oklch(48% 0.044 266.9)", "oklch(59% 0.044 266.9)", "oklch(70% 0.044 266.9)", "oklch(82% 0.044 266.9)", "oklch(95% 0.030 266.9)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The holder's name on the ticket; privacy page title at a smaller clamp." },
+      "headline": { "displayName": "Headline", "purpose": "Section heads and the footer pitch." },
+      "title": { "displayName": "Title", "purpose": "Role, project and school names." },
+      "body": { "displayName": "Body", "purpose": "Running text, role bodies (max 62ch)." },
+      "lede": { "displayName": "Lede", "purpose": "The summary on the ticket (max 60ch, muted)." },
+      "figure": { "displayName": "Figure", "purpose": "Tabular row numbers and dates." },
+      "legend": { "displayName": "Legend", "purpose": "Uppercase tracked ticket legends: the ADMIT ONE band and the holder line." }
+    },
+    "shadows": [
+      { "name": "ticket-lift", "value": "filter: drop-shadow(0 1px 1px rgb(15 28 51 / 8%)) drop-shadow(0 14px 22px rgb(15 28 51 / 16%))", "purpose": "The hero ticket only; drop-shadow so the punched notches stay open." }
+    ],
+    "motion": [
+      { "name": "ease-settle", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Ticket and stub entrance." },
+      { "name": "ticket-in", "value": "0.7s, from translateY(14px)", "purpose": "Ticket rises into place on load." },
+      { "name": "stub-in", "value": "0.9s, 0.15s delay, from translateX(-10px) rotate(-.6deg); mobile from translateY(-8px)", "purpose": "Stub is handed over a beat after the ticket." },
+      { "name": "color-hover", "value": "0.15s ease-out", "purpose": "Button background, border and text colour changes." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "760px" }
+    ],
+    "perforation": {
+      "notchRadius": "13px",
+      "seamRule": "2px dashed rgb(255 255 255 / 55%), inset 1.25rem from each end",
+      "rowRule": "1px dashed #9aa6bb",
+      "footRule": "1px dashed #d3dae6"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single crimson action per screen (Email me).",
+      "html": "<a class=\"ds-btn ds-btn-primary\" href=\"#\">Email me</a>",
+      "css": ".ds-btn { display: inline-block; font-family: 'Schibsted Grotesk', Arial, sans-serif; font-weight: 700; padding: .7rem 1.2rem; border: 2px solid #00285e; border-radius: 8px; color: #00285e; text-decoration: none; transition: background-color .15s ease-out, border-color .15s ease-out, color .15s ease-out; } .ds-btn-primary { background: #ab0c2f; border-color: #ab0c2f; color: #fff; } .ds-btn-primary:hover { background: #8a0925; border-color: #8a0925; } .ds-btn:focus-visible { outline: 2px solid #00285e; outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Navy outlined action for the résumé PDF and LinkedIn.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">Download résumé <span class=\"ds-btn-note\">PDF</span></a>",
+      "css": ".ds-btn-secondary { display: inline-block; font-family: 'Schibsted Grotesk', Arial, sans-serif; font-weight: 700; padding: .7rem 1.2rem; border: 2px solid #00285e; border-radius: 8px; color: #00285e; background: transparent; text-decoration: none; transition: background-color .15s ease-out, color .15s ease-out; } .ds-btn-secondary:hover { background: #00285e; color: #fff; } .ds-btn-secondary:focus-visible { outline: 2px solid #00285e; outline-offset: 3px; } .ds-btn-note { font-size: .75em; font-weight: 600; margin-left: .3em; }"
+    },
+    {
+      "name": "Header Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Slim header: navy name, muted links that go navy and underline on hover.",
+      "html": "<header class=\"ds-header\"><a class=\"ds-brand\" href=\"#\">Ethan Jad</a><nav class=\"ds-nav\"><a href=\"#\">Experience</a><a href=\"#\">Education</a><a href=\"#\">Contact</a></nav></header>",
+      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 68px; padding: 0 1.5rem; border-bottom: 1px solid #d3dae6; background: #eef1f6; font-family: 'Schibsted Grotesk', Arial, sans-serif; } .ds-brand { color: #00285e; font-weight: 800; letter-spacing: -.02em; text-decoration: none; } .ds-nav { display: flex; gap: 1.5rem; } .ds-nav a { color: #535d70; font-size: .9rem; font-weight: 600; text-decoration: none; text-underline-offset: .2em; } .ds-nav a:hover { color: #00285e; text-decoration: underline; } .ds-nav a:focus-visible { outline: 2px solid #00285e; outline-offset: 3px; border-radius: .25rem; }"
+    },
+    {
+      "name": "Season Ticket",
+      "kind": "custom",
+      "refersTo": "ticket-main",
+      "description": "Signature hero: edge band, ticket stock main panel, navy stub torn along a perforation with punched notches.",
+      "html": "<div class=\"ds-ticket\"><div class=\"ds-band\">Admit one</div><div class=\"ds-main\"><h1 class=\"ds-name\">Ethan Jad</h1><p class=\"ds-lede\">Finance and ISBA student at LMU.</p><p class=\"ds-foot\">Holder Ethan Jad · ethanjad.me</p></div><div class=\"ds-stub\"><ul class=\"ds-facts\"><li>LMU</li><li>Class of 2027</li><li>GPA 3.62</li></ul></div></div>",
+      "css": ".ds-ticket { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) minmax(200px, 30%); font-family: 'Schibsted Grotesk', Arial, sans-serif; filter: drop-shadow(0 1px 1px rgb(15 28 51 / 8%)) drop-shadow(0 14px 22px rgb(15 28 51 / 16%)); } .ds-band { background: #00285e; color: #c3d0ee; font-size: .75rem; font-weight: 700; letter-spacing: .32em; text-transform: uppercase; text-align: center; padding-block: 1.5rem; writing-mode: vertical-rl; transform: rotate(180deg); border-radius: 0 14px 14px 0; } .ds-main { --notch: 13px; background: #fff; display: flex; flex-direction: column; padding: 2rem; mask: radial-gradient(circle var(--notch) at 100% 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle var(--notch) at 100% 100%, transparent 98%, #000) bottom / 100% 51% no-repeat; } .ds-name { color: #00285e; font-size: 3rem; font-weight: 800; letter-spacing: -.04em; line-height: .92; margin: 0 0 1rem; } .ds-lede { color: #535d70; font-size: 1.15rem; margin: 0 0 1.5rem; } .ds-foot { margin: auto 0 0; padding-top: 1rem; border-top: 1px dashed #d3dae6; color: #535d70; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; } .ds-stub { --notch: 13px; position: relative; background: #00285e; color: #fff; padding: 1.75rem; border-radius: 0 14px 14px 0; mask: radial-gradient(circle var(--notch) at 0 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle var(--notch) at 0 100%, transparent 98%, #000) bottom / 100% 51% no-repeat; } .ds-stub::before { content: ''; position: absolute; left: 0; top: 1.25rem; bottom: 1.25rem; border-left: 2px dashed rgb(255 255 255 / 55%); } .ds-facts { list-style: none; margin: 0; padding: 0 0 0 .75rem; font-size: 1.05rem; font-weight: 650; line-height: 1.35; } .ds-facts li { padding-block: .7rem; border-bottom: 1px solid rgb(255 255 255 / 18%); } .ds-facts li:first-child { padding-top: 0; } .ds-facts li:last-child { border-bottom: 0; }"
+    },
+    {
+      "name": "Schedule Fixture",
+      "kind": "custom",
+      "refersTo": "fixture-number",
+      "description": "Experience row: tabular row number, tabular dates, then the role, split by dashed perforations.",
+      "html": "<ol class=\"ds-schedule\"><li class=\"ds-fixture\"><span class=\"ds-no\">01</span><p class=\"ds-dates\">Jun 2026 – Present</p><div><h3 class=\"ds-title\">Financial Budgeting Intern</h3><p class=\"ds-org\">LMU Student Housing</p><p class=\"ds-body\">Departmental budgeting work.</p></div></li></ol>",
+      "css": ".ds-schedule { list-style: none; margin: 0; padding: 0; font-family: 'Schibsted Grotesk', Arial, sans-serif; } .ds-fixture { display: grid; grid-template-columns: 2ch 8.5rem minmax(0, 1fr); column-gap: 1.25rem; padding-block: 1.6rem; border-top: 1px dashed #9aa6bb; border-bottom: 1px dashed #9aa6bb; } .ds-no, .ds-dates { margin: 0; padding-top: .1rem; color: #535d70; font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.6; } .ds-no { color: #00285e; } .ds-title { margin: 0 0 .2rem; color: #0f1c33; font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.35; } .ds-org { margin: 0 0 .5rem; color: #00285e; font-size: .95rem; font-weight: 600; } .ds-body { margin: 0; color: #535d70; line-height: 1.6; max-width: 62ch; }"
+    },
+    {
+      "name": "Skill List",
+      "kind": "chip",
+      "refersTo": "skill-list",
+      "description": "Skills as a wrapped run of bold words; deliberately not chips.",
+      "html": "<ul class=\"ds-skills\"><li>SQL</li><li>Python</li><li>Excel</li><li>Budgeting</li></ul>",
+      "css": ".ds-skills { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; list-style: none; margin: 0; padding: 0; color: #0f1c33; font-family: 'Schibsted Grotesk', Arial, sans-serif; font-size: .95rem; font-weight: 600; }"
+    },
+    {
+      "name": "Contact Footer",
+      "kind": "custom",
+      "refersTo": "footer",
+      "description": "Navy band with the pitch, a large underlined email, and haze links.",
+      "html": "<footer class=\"ds-footer\"><h2 class=\"ds-pitch\">Hiring an intern in analytics, finance, or sports business?</h2><a class=\"ds-email\" href=\"#\">name@example.com</a><div class=\"ds-links\"><a href=\"#\">Résumé (PDF)</a><a href=\"#\">LinkedIn <svg aria-hidden=\"true\" viewBox=\"0 0 12 12\" width=\"11\" height=\"11\"><path d=\"M3.5 8.5l5-5M4.5 3.5h4v4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a><a href=\"#\">Privacy</a></div></footer>",
+      "css": ".ds-footer { background: #00285e; color: #fff; padding: 4rem 1.5rem; font-family: 'Schibsted Grotesk', Arial, sans-serif; } .ds-pitch { color: #fff; max-width: 460px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 0 0 1.75rem; } .ds-email { color: #fff; font-size: 1.3rem; font-weight: 700; text-decoration: underline; text-decoration-color: rgb(255 255 255 / 40%); text-decoration-thickness: 2px; text-underline-offset: .2em; } .ds-email:hover { text-decoration-color: #fff; } .ds-links { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 2rem; } .ds-links a { color: #c3d0ee; font-size: .9rem; font-weight: 600; text-decoration: none; } .ds-links a:hover { color: #fff; text-decoration: underline; } .ds-footer a:focus-visible { outline: 2px solid #c3d0ee; outline-offset: 3px; border-radius: .25rem; } .ds-links svg { margin-left: .15em; vertical-align: -.05em; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Season Ticket",
+    "overview": "The recruiter is handed one ticket. The whole system is built from the material of a printed game-day pass: white ticket stock lying on a cool grey-blue counter, LMU navy ink and an edge band, perforations drawn as dashed rules with notches punched clean through the stock, and fine-print legends set small, bold, and widely tracked. Everything below the hero continues the same paper logic: experience reads as a numbered season schedule split by perforations, education and skills read as the ticket's fine print.\n\nDensity is calm and editorial. Rank comes from space and position, not from many type sizes: one very large navy name, one heading size per section, and a quiet body. Colour is nearly monochrome navy on cool neutrals; crimson appears exactly once per screen, on the single primary action. The result should read as a polished, focused LMU student, clean and modern, never a finance tear-sheet and never the generic portfolio hero of headline, subcopy, pill buttons and card row.\n\nMotion is a single entrance: the ticket settles up into place and the stub slides in a beat later, as if just torn and handed over. Nothing else moves except colour on hover.",
+    "keyCharacteristics": [
+      "One ticket as the hero: edge band, main panel, perforated tear-off stub.",
+      "Navy ink everywhere; crimson reserved for one action.",
+      "Perforations (dashed rules + punched notches) as the only decorative device.",
+      "One typeface, Schibsted Grotesk, ranked by weight and space.",
+      "Tabular figures on every date and row number, proportional figures in prose."
+    ],
+    "rules": [
+      { "name": "The One Crimson Rule", "body": "Crimson is used for the single primary action on a screen and nowhere else: not for links, headings, tags, or hover states of other elements.", "section": "colors" },
+      { "name": "The Navy Ink Rule", "body": "Emphasis is navy, not a new colour. When something needs to stand out, make it navy and heavier before reaching for anything else.", "section": "colors" },
+      { "name": "The Tabular Dates Rule", "body": "Every date and row number uses tabular figures; prose never does, because this face widens commas and periods under `tnum`.", "section": "typography" },
+      { "name": "The Few Sizes Rule", "body": "Rank by space, weight and colour, not by adding sizes. A new surface reuses display, headline, title, body and figure; it does not introduce a new step.", "section": "typography" },
+      { "name": "The One Object Rule", "body": "Only the ticket casts a shadow. Sections, lists, and sidebar items are flat; they are print on the page, not objects on it.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep crimson on exactly one primary action per screen.",
+      "Do draw separations as perforations: dashed rules, with punched 13px notches where a ticket edge tears.",
+      "Do set every date and row number in tabular figures, and keep prose proportional.",
+      "Do use Schibsted Grotesk for every role, with the metric-matched fallback.",
+      "Do keep text on navy in on-navy or on-navy-muted, and rules on navy as translucent white.",
+      "Do lift only the ticket, using drop-shadow so the notches stay punched."
+    ],
+    "donts": [
+      "Don't use a box-shadow on the ticket; it fills in the notches.",
+      "Don't use pill-shaped buttons or tag chips; buttons are 8px, skills are plain words.",
+      "Don't fall back to the generic portfolio hero (headline, subcopy, pill buttons, card row).",
+      "Don't introduce a second typeface or new type sizes for emphasis; use weight, navy, and space.",
+      "Don't use perforation grey for text; it is a rule colour only.",
+      "Don't add uppercase tracked labels above headings; the tracked legend voice belongs to the ticket's own band and fine print."
+    ]
+  }
+}

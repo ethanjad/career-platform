@@ -43,7 +43,7 @@ def test_homepage_hero_renders_headline_as_fact_row(monkeypatch):
     assert 'class="eyebrow"' not in response.text
     assert "<li>Loyola Marymount University</li>" in response.text
     assert "<li>GPA 3.62</li>" in response.text
-    assert '<span class="now-label">Currently</span>' in response.text
+    assert '<p class="now">' in response.text
     assert "<title>Alex Carter | BBA Finance &amp; ISBA</title>" in response.text
 
 
@@ -81,14 +81,14 @@ def test_resume_button_and_route_appear_only_when_pdf_exists(monkeypatch, tmp_pa
     missing = client.get("/resume.pdf")
     assert missing.status_code == 404
     assert profile["email"] in missing.text
-    assert "Download résumé" not in client.get("/").text
+    assert 'résumé <span class="button-note">PDF</span>' not in client.get("/").text
 
     pdf.write_bytes(b"%PDF-1.4 test")
     served = client.get("/resume.pdf")
     assert served.status_code == 200
     assert served.headers["content-type"] == "application/pdf"
     assert "Alex-Carter-Resume.pdf" in served.headers["content-disposition"]
-    assert "Download résumé" in client.get("/").text
+    assert 'résumé <span class="button-note">PDF</span>' in client.get("/").text
 
 
 def test_empty_sections_are_hidden_instead_of_promising_content(monkeypatch):
