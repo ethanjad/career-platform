@@ -94,6 +94,85 @@ uv run python -m scripts.copy_database SOURCE_URL TARGET_URL
 Run the tests against Postgres by pointing `TEST_DATABASE_URL` at a
 throwaway database whose name contains `test`.
 
+## Moving from Azure to Railway and PostgreSQL (2026-10-08)
+
+Plan and progress log:
+[2026-10-08-railway-postgres-migration.md](docs/superpowers/plans/2026-10-08-railway-postgres-migration.md).
+There was no separate design spec for this move. The plan was written from
+the request and from what inspecting the app found, and those findings are
+listed at the top of the plan.
+
+**How the data was preserved:**
+
+1. **Export.** The VM's SQLite file was exported with `sqlite3 .backup`, an online, consistent copy. That copy is kept off-repo as `resume.db.bak-railway-20261008-214832`.
+2. **Copy.** `scripts/copy_database.py` copied every table into Railway Postgres, keeping each row's `id`. It then moved the id sequences past the highest id, so the next admin insert doesn't collide. It refuses to write into a database that already has data unless given `--replace`.
+3. **Copy before the first deploy.** The data went in before the first deploy, so the app's startup step found a profile row and didn't seed the demo data.
+
+The copied rows keep ids that seeding could never produce: experience 3–6, projects 5–6, link 7. Seeding always starts at 1. The source-versus-target comparison is in the plan's progress log.
+
+**Who is responsible for what:**
+
+| Layer | Azure VM | Railway |
+|---|---|---|
+| Operating system | Me: Ubuntu 24.04, patched with `apt` | Railway (container image built by Railpack) |
+| Python runtime | Me: a uv-managed venv on the VM | Railway, pinned by `.python-version` (3.12) |
+| Entry point / process | Me: systemd unit, `uvicorn --workers 2` | Railway runs `start.sh` (one uvicorn) and restarts it `ON_FAILURE` |
+| Reverse proxy and TLS | Me: nginx + Certbot (Let's Encrypt) | Railway's edge, with automatic Let's Encrypt |
+| Firewall | Me: Azure NSG rules | Railway. Public: the web service, plus a TCP proxy to Postgres (password-protected) used only for laptop-side copies |
+| Code delivery | Me: `ssh` + `git pull` + `systemctl restart` | Railway: build and deploy on each push to `main`, gated by `/healthz` |
+| Configuration and secrets | Me: `.env` on the VM disk | Railway service variables (`DATABASE_URL`, `ADMIN_SECRET`) |
+| Database software | Me: SQLite library inside the app | Railway: managed PostgreSQL 18 service |
+| Data | Me: one file on the VM disk, backups by hand | Railway volume behind Postgres. **Backups are still mine** (`copy_database` to a file) |
+| DNS | Me: Cloudflare A record to the VM IP | Still me: Cloudflare CNAME to Railway, plus the `www` redirect rule |
+| App code, content, admin secret | Me | Still me |
+
+## Rollback
+
+### Code
+
+Every deploy is a commit on `main`, so rolling back code is a revert:
+
+```bash
+git revert <bad-sha>        # new commit that undoes it
+git push origin main        # Railway builds and deploys it like any change
+```
+
+If `main` can't be fixed quickly, redeploy an earlier good build from the
+Railway dashboard (Deployments → ⋯ → Redeploy). Then revert on `main`, so
+the next push doesn't bring the bad code back.
+
+### Database
+
+Content changes go through the admin API, so undoing one is another admin
+call, made with the old values (`PUT /admin/<table>/<id>`) or a `DELETE`.
+Before any risky change, take a copy first:
+
+```bash
+set -a; . ./.env; set +a
+uv run python -m scripts.copy_database "$RAILWAY_DATABASE_URL" "sqlite:///$HOME/Desktop/github/resume-$(date +%Y%m%d-%H%M).db"
+```
+
+To restore that copy (this overwrites everything in Postgres):
+
+```bash
+uv run python -m scripts.copy_database "sqlite:///$HOME/Desktop/github/resume-<stamp>.db" "$RAILWAY_DATABASE_URL" --replace
+```
+
+### Back off Railway, keeping data written after cutover
+
+Rolling back to the pre-cutover SQLite export would lose every edit made
+on Railway, such as the "this website, in progress" project. So **export
+from Postgres at rollback time**, not from the old file:
+
+1. **Freeze.** Make no admin writes from here on.
+2. **Export the live data.** Run the `copy_database` Postgres → SQLite command above. This was tested on 2026-10-21 on a local cluster: a row written after the copy came back with its id.
+3. **Restore on the new host.** Put that file on the new host as `data/resume.db`, with the same app commit.
+4. **Switch DNS.** In Cloudflare, point `ethanjad.me` at the new host (an A record, DNS only), then check `curl https://ethanjad.me/healthz`.
+
+The old Azure VM was deleted on 2026-10-19. A rollback to Azure now means
+rebuilding it from the [VM plan](docs/superpowers/plans/2026-10-01-operate-the-vm.md)
+before step 3.
+
 ## Project 1 evidence
 
 See [docs/project-1-submission.md](docs/project-1-submission.md) for the full

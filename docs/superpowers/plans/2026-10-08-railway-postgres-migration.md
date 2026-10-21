@@ -10,6 +10,60 @@
 
 **Spec:** No separate spec. This plan is based on the 2026-10-08 request ("move the app to Railway and PostgreSQL; the Railway project already exists with Postgres and a web service") and the findings below.
 
+## Progress log
+
+_The steps below were carried out on 2026-10-08, but the boxes were never ticked and results weren't written down on the day. This log was reconstructed on 2026-10-21 from records that survive: the export file, Railway's deployment list, Cloudflare record timestamps and the live certificate. Anything not recoverable is marked as such._
+
+### Export (Task 6 Step 4)
+
+- **File:** `~/Desktop/github/resume.db.bak-railway-20261008-214832` (off-repo), written 2026-10-08 21:48:32 UTC.
+- **Proof it's the VM copy:** its headline includes "Class of 2027", which Finding 1 says only the VM had. The laptop's older `resume.db` has "Finance and ISBA Student at Loyola Marymount University".
+- **Counts (`sqlite3 -readonly`, 2026-10-21):** profile 1, experience 4, education 2, skills 4, projects 2, links 1, settings 1. These are exactly the counts expected in Step 4/5.
+
+### Copy (Task 6 Step 5)
+
+- The `copy_database` output from 2026-10-08 wasn't saved. Since the script prints the source row counts, it would have matched the counts above.
+- Source-vs-target comparison: _pending. The Railway Postgres public proxy was failing TLS handshakes on 2026-10-21 during a Railway incident. To be filled in when it's reachable._
+
+### Real data that seeding couldn't reproduce
+
+Seeding numbers rows from 1. The exported data has experience ids 3–6, projects 5–6 and link 7, because the demo rows were deleted and real ones added on the VM. Its headline is the "Class of 2027" edit, and its link is `https://www.linkedin.com/in/ethanjad`. None of this is in any seed. Live ids: _see the comparison above, pending._
+
+### Cutover (Task 7)
+
+Timeline in UTC, 2026-10-08:
+
+| Time | Event | Source |
+|---|---|---|
+| 21:27, 21:30, 22:08 | Three Railway deploys `FAILED` (`a7b5899` twice, `3f89893`) | `railway deployment list` |
+| 21:38:56 | Let's Encrypt `YR2` certificate for `ethanjad.me` issued to Railway | certificate `notBefore` |
+| 22:29:49 | Deploy of merge `7ca25e5` started; later replaced by newer deploys | `railway deployment list` |
+| 22:34:07 | `CNAME ethanjad.me → mdkjjfll.up.railway.app` created (DNS only) | Cloudflare `created_on` |
+| 22:34:37 | `TXT _railway-verify` created | Cloudflare `created_on` |
+
+The certificate predates the current DNS records by about an hour, so the records were probably re-created at 22:34. Why isn't recorded.
+
+**Task 7 Step 5:** the results weren't recorded on 2026-10-08. The same commands were run on 2026-10-21 01:42 PDT:
+
+```
+$ dig +short ethanjad.me
+69.46.46.65
+$ curl -sSI https://ethanjad.me | grep -i '^server'
+server: railway-hikari
+$ curl -sSI http://ethanjad.me | head -1
+HTTP/1.1 301 Moved Permanently
+$ curl -sSL https://www.ethanjad.me/healthz
+ok
+$ curl -sS https://ethanjad.me/ | grep -c 'Ethan Jad'
+4
+$ openssl … -issuer -enddate
+issuer=C=US, O=Let's Encrypt, CN=YR2
+notAfter=Jan  6 21:38:55 2027 GMT
+```
+
+- `www` is no longer a Railway CNAME. Since 2026-10-19 it's a Cloudflare redirect, so `/healthz` is reached through one 301 (`-L`). See [dns-and-https.md](../../evidence/dns-and-https.md).
+- The server header is `railway-hikari` where the plan expected `railway-edge`. That's Railway's current edge name.
+
 ## Findings from inspecting the app (2026-10-08)
 
 1. **The live data is on the VM, not the laptop.** VM `~/career-platform/data/resume.db` (last written 2026-10-08) holds Ethan's real profile: 1 profile, 4 experience, 2 education, 4 skills, 2 projects, 1 link. The laptop's `~/Desktop/github/resume.db` is older (its headline predates the Class of 2027 edit), and `career-platform/data/` holds only the demo snapshot. **Migrate from the VM copy.**

@@ -42,17 +42,25 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 ## 4. Railway and PostgreSQL migration
 
 - [ ] Record the export, copy counts, and the source-vs-target record, content and page comparison — progress log in `docs/superpowers/plans/2026-10-08-railway-postgres-migration.md`
+  - **Partly done 2026-10-21:** export identified (VM copy, 21:48 UTC) and its counts are recorded in the plan's progress log. The source-vs-target comparison is waiting on the Railway Postgres public proxy (Railway incident).
 - [ ] Show one real change to the original data that seed data couldn't reproduce — same progress log
-- [ ] Record the cutover and the post-cutover checks (Task 7 Step 5 results) — same progress log
-- [ ] Rollback procedure that handles data written after cutover — README rollback section
-- [ ] Azure vs Railway responsibility comparison (OS, runtime, entry point, TLS, code, config, DB software, data, DNS) — README
-- [ ] Mark the "No separate spec" gap honestly, or link the spec — README and `docs/project-1-submission.md`
-- [ ] Link the migration plan from the README and the submission index — `README.md`, `docs/project-1-submission.md`
+  - **Partly done 2026-10-21:** the export's non-seed ids (experience 3–6, projects 5–6, link 7) and the "Class of 2027" headline are recorded. Confirming them in live Postgres is waiting on the same proxy.
+- [x] Record the cutover and the post-cutover checks (Task 7 Step 5 results) — same progress log
+  - **Done 2026-10-21:** cutover timeline rebuilt from Railway, Cloudflare and certificate timestamps. Step 5 wasn't recorded on the day, so it was re-run today and the output logged. Both are noted honestly in the plan.
+- [x] Rollback procedure that handles data written after cutover — README rollback section
+  - **Done 2026-10-21:** README "Rollback": export from Postgres at rollback time. The round trip was tested locally, and a row written after the copy came back with its id.
+- [x] Azure vs Railway responsibility comparison (OS, runtime, entry point, TLS, code, config, DB software, data, DNS) — README
+  - **Done 2026-10-21:** README table covering 11 layers.
+- [x] Mark the "No separate spec" gap honestly, or link the spec — README and `docs/project-1-submission.md`
+  - **Done 2026-10-21:** stated in the README migration section and the submission index.
+- [x] Link the migration plan from the README and the submission index — `README.md`, `docs/project-1-submission.md`
+  - **Done 2026-10-21.**
 
 ## 5. Reviewed change through Railway
 
 - [ ] Record one change: commit SHA → Railway deployment ID → behaviour seen at ethanjad.me — evidence file linked from the submission index
-- [ ] Rollback for code and database changes — README rollback section
+- [x] Rollback for code and database changes — README rollback section
+  - **Done 2026-10-21:** README "Rollback → Code / Database" (revert + push, dashboard redeploy, `copy_database` backup/restore).
 
 ## 6. Zoho email
 
