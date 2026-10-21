@@ -44,7 +44,7 @@ def split_dates(details: str) -> tuple[str, str]:
 
 templates.env.filters["split_dates"] = split_dates
 
-@app.get("/", name="resume")
+@app.api_route("/", methods=["GET", "HEAD"], name="resume")
 def resume(request: Request):
     profile = get_profile()
     return templates.TemplateResponse(
@@ -55,12 +55,12 @@ def resume(request: Request):
     )
 
 
-@app.get("/privacy", name="privacy")
+@app.api_route("/privacy", methods=["GET", "HEAD"], name="privacy")
 def privacy(request: Request):
     return templates.TemplateResponse(request=request, name="privacy.html", context={"profile": get_profile()})
 
 
-@app.get("/resume.pdf", name="resume_pdf")
+@app.api_route("/resume.pdf", methods=["GET", "HEAD"], name="resume_pdf")
 def resume_pdf():
     profile = get_profile()
     if not settings.resume_pdf_path.is_file():
@@ -72,7 +72,7 @@ def resume_pdf():
     return FileResponse(settings.resume_pdf_path, media_type="application/pdf", filename=filename)
 
 
-@app.get("/healthz", include_in_schema=False)
+@app.api_route("/healthz", methods=["GET", "HEAD"], include_in_schema=False)
 def healthz():
     try:
         with get_engine().connect() as connection:

@@ -38,3 +38,13 @@ def test_app_starts_and_serves_503_page_when_database_is_down_at_boot(monkeypatc
     assert response.status_code == 503
     assert "Ethan Jad" in response.text
     assert "Projects temporarily unavailable" in response.text
+
+
+def test_public_routes_answer_head_requests_like_get():
+    initialize_database()
+    client = TestClient(app)
+
+    for path in ("/", "/privacy", "/healthz"):
+        response = client.head(path)
+        assert response.status_code == 200, path
+        assert response.content == b"", path
