@@ -80,6 +80,7 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 - [ ] README: how the migration preserved data and which responsibilities moved — `README.md`
 - [ ] README: two decisions with alternatives (Railway migration, managed vs self-hosted email) — `README.md`
 - [ ] README: an app/DB failure with symptom, checks, diagnosis, fix and repeat check (ex03's is a sizing story, so consider a Railway migration failure) — `README.md` linking the record
+  - **Decided 2026-10-21:** keep ex03 and add the Oct 8 Railway deploy failures (with their logs) alongside it. Both are included.
 - [ ] README: link the DNS/TLS failure, labeled as a simulation — `README.md` linking `docs/evidence/ex05.md`
 - [ ] README: reflection — `README.md`
 - [ ] README: service costs or credits, Railway trial end date, cleanup plan, remaining limitations — `README.md`
