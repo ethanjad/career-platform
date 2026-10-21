@@ -104,3 +104,4 @@ list. Exercise write-ups:
 - [How this site is secured (HTTPS)](docs/how-this-site-is-secured.md)
 - [Azure VM: restart setup, final NSG rules, retirement](docs/evidence/azure-vm-retired.md)
 - [Database down → 503 → recovery](docs/evidence/db-failure-503.md)
+- [DNS records, www redirect and certificates](docs/evidence/dns-and-https.md)

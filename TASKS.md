@@ -32,9 +32,12 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 
 ## 3. Domain and HTTPS
 
-- [ ] Record the current DNS records with what each one is for — dated `cf dns records list` output in a tracked evidence file
-- [ ] Commit the DNS-before-Zoho snapshot — `docs/evidence/dns-before-zoho.md`
-- [ ] Verify `http://www.ethanjad.me` and `https://www.ethanjad.me` both land on the root with a valid certificate — dated `curl -sI` output in evidence
+- [x] Record the current DNS records with what each one is for — dated `cf dns records list` output in a tracked evidence file
+  - **Done 2026-10-21:** `docs/evidence/dns-and-https.md`: all 10 records, with a purpose table and a public-DNS cross-check.
+- [x] Commit the DNS-before-Zoho snapshot — `docs/evidence/dns-before-zoho.md`
+  - **Done 2026-10-21:** committed, with the old VM IP redacted and a note on the later www change.
+- [x] Verify `http://www.ethanjad.me` and `https://www.ethanjad.me` both land on the root with a valid certificate — dated `curl -sI` output in evidence
+  - **Done 2026-10-21 01:36 PDT:** both → 301 → `https://ethanjad.me/` → 200, `ssl_verify_result=0`. Certificates recorded. Found: HEAD `/` returns 405 (GET-only routes).
 
 ## 4. Railway and PostgreSQL migration
 
