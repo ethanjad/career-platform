@@ -1,108 +1,115 @@
 {
   "id": 1,
-  "name": "Alex Carter",
-  "headline": "Senior Business Analytics Student",
-  "summary": "Business analytics student focused on turning complex data into clear decisions, actionable insights, and measurable outcomes for organizations.",
-  "email": "alex.carter@example.com",
+  "name": "Ethan Jad",
+  "headline": "BBA in Finance and Information Systems & Business Analytics (ISBA) \u00b7 Loyola Marymount University \u00b7 Class of 2027 \u00b7 GPA 3.62 \u00b7 Dean's List 4\u00d7",
+  "summary": "A highly-driven Finance and ISBA student with strong analytical and problem-solving skills with a passion for business development.",
+  "email": "ethanjad@gmail.com",
   "experience": [
     {
       "id": 1,
-      "title": "Data Analyst Intern",
-      "company": "Northwind Retail",
-      "details": "Built SQL-based dashboards and KPI tracking for customer and merchandising data."
+      "title": "Financial Budgeting Intern",
+      "company": "Student Housing Office, Loyola Marymount University",
+      "details": "Jun 2026 \u2013 Present. Conduct expense and inventory management representative of the LMU housing department."
     },
     {
       "id": 2,
-      "title": "Business Operations Assistant",
-      "company": "Civic Insights Group",
-      "details": "Supported forecasting, process improvement, and cross-functional reporting projects."
+      "title": "Front Office Assistant",
+      "company": "Student Housing Office, Loyola Marymount University",
+      "details": "Aug 2025 \u2013 May 2026. First point of contact for students, parents, and staff by providing information and resolving inquiries. Manage high volume of emails, phone calls, and interactions with professionalism and efficiency."
+    },
+    {
+      "id": 3,
+      "title": "International Consulting Intern",
+      "company": "Lorawine Startup, Los Angeles, California",
+      "details": "Aug 2025 \u2013 Dec 2025. Creating data-based strategy for Lorawine, an Italian-based startup, in the expansion to Napa, California, specialized in environmental and strategic positioning for entry into the US market. Worked alongside Buonquillo International to seek competitive advantages through the use of AI."
+    },
+    {
+      "id": 4,
+      "title": "Mentee",
+      "company": "Remote Job Shadowing Program, San Mateo, California",
+      "details": "May 2025 \u2013 Aug 2025. Paired with a finance professional through LMU's alumni network for one-on-one mentorship. Engaged in biweekly, hour-long phone calls discussing industry insights and professional development."
     }
   ],
   "education": [
     {
       "id": 1,
-      "school": "Rensselaer Polytechnic Institute",
-      "degree": "Bachelor of Science",
-      "field": "Business Analytics",
-      "details": "Focus on data analysis, forecasting, and decision support systems."
+      "school": "Loyola Marymount University",
+      "degree": "Bachelor of Business Administration",
+      "field": "ISBA and Finance",
+      "details": "Aug 2023 \u2013 Present \u00b7 Los Angeles, California \u00b7 GPA 3.62 \u00b7 Dean's List (4x)"
     },
     {
       "id": 2,
-      "school": "University of Washington",
-      "degree": "Certificate",
-      "field": "Business Intelligence",
-      "details": "Completed coursework in SQL, Excel analytics, and data storytelling."
+      "school": "Junipero Serra High School",
+      "degree": "High School Diploma",
+      "field": "CSF Seal Bearer",
+      "details": "Aug 2019 \u2013 May 2023 \u00b7 San Mateo, California \u00b7 GPA 3.87"
     }
   ],
   "skills": [
     {
-      "id": 5,
-      "name": "Forecasting",
-      "category": "analytical"
-    },
-    {
-      "id": 6,
-      "name": "Data Visualization",
-      "category": "analytical"
-    },
-    {
-      "id": 7,
-      "name": "Stakeholder Communication",
-      "category": "business"
-    },
-    {
-      "id": 8,
-      "name": "Project Management",
-      "category": "business"
-    },
-    {
       "id": 1,
-      "name": "SQL",
+      "name": "Microsoft Office",
       "category": "technical"
     },
     {
       "id": 2,
-      "name": "Python",
+      "name": "Google Suite",
       "category": "technical"
     },
     {
       "id": 3,
-      "name": "Excel",
+      "name": "MySQL Workbench",
       "category": "technical"
     },
     {
       "id": 4,
-      "name": "Power BI",
+      "name": "Python",
       "category": "technical"
     }
   ],
   "projects": [
     {
       "id": 1,
-      "title": "Revenue Trend Dashboard",
-      "summary": "Built an executive dashboard tracking revenue and funnel metrics."
+      "title": "Sports Business Association",
+      "summary": "Active club member."
     },
     {
       "id": 2,
-      "title": "Customer Retention Study",
-      "summary": "Analyzed churn drivers and recommended actions for loyalty programs."
+      "title": "Finance Society",
+      "summary": "Active club member."
+    },
+    {
+      "id": 3,
+      "title": "Hoops Recap",
+      "summary": "Co-founder & content creator of a basketball media platform."
+    },
+    {
+      "id": 4,
+      "title": "Friends of Ballona Wetlands",
+      "summary": "Volunteer and active member of the environmentalist group (Aug 2025 \u2013 Present)."
+    },
+    {
+      "id": 5,
+      "title": "Nikkei Student Union",
+      "summary": "Active club member and travel basketball player representing LMU."
+    },
+    {
+      "id": 6,
+      "title": "ISBA Student Society",
+      "summary": "Active club member."
     }
   ],
   "links": [
     {
       "id": 1,
       "label": "LinkedIn",
-      "url": "https://www.linkedin.com"
+      "url": "https://www.linkedin.com/in/ethanjad"
     },
     {
       "id": 2,
       "label": "GitHub",
-      "url": "https://github.com"
-    },
-    {
-      "id": 3,
-      "label": "Portfolio",
-      "url": "https://example.com"
+      "url": "https://github.com/ethanjad"
     }
   ],
   "settings": {

@@ -126,7 +126,7 @@ h3 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; line-height: 1
 @media (prefers-reduced-motion: reduce) { .ticket, .ticket-stub { animation: none; } }
 
 .content-grid { display: grid; gap: clamp(3rem, 7vw, 6rem); grid-template-columns: minmax(0, 1.6fr) minmax(250px, .8fr); padding-block: 2.5rem 6rem; }
-.content-grid-single { grid-template-columns: minmax(0, 1fr); }
+.section-note { color: var(--muted); margin: 0; max-width: 62ch; }
 /* The sidebar rides along beside the long schedule instead of leaving dead space under it. */
 .side-column { align-self: start; position: sticky; top: 1.5rem; }
 .section { scroll-margin-top: 1.5rem; }

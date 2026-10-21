@@ -10,4 +10,5 @@
 | 03 | Deploying the site to an Azure VM | [ex03.md](evidence/ex03.md) |
 | 05 | Diagnosing a DNS failure after a migration (simulation) | [ex05.md](evidence/ex05.md) |
 | 06 | Email (Zoho) and Google Analytics evidence | [ex06.md](evidence/ex06.md) |
+| DB failure | Database down → 503 → recovery on refresh | [db-failure-503.md](evidence/db-failure-503.md) |
 | HTTPS | How the site is secured | [how-this-site-is-secured.md](how-this-site-is-secured.md) |

@@ -28,8 +28,8 @@ def test_homepage_renders_every_recruiter_facing_section():
     assert response.status_code == 200
     for section in ("Experience", "Education", "Skills", "Projects", 'id="contact"'):
         assert section in response.text
-    assert "Data Analyst Intern" in response.text
-    assert "Revenue Trend Dashboard" in response.text
+    assert "Financial Budgeting Intern" in response.text
+    assert "Hoops Recap" in response.text
 
 
 def test_homepage_hero_renders_headline_as_fact_row(monkeypatch):
@@ -44,11 +44,13 @@ def test_homepage_hero_renders_headline_as_fact_row(monkeypatch):
     assert "<li>Loyola Marymount University</li>" in response.text
     assert "<li>GPA 3.62</li>" in response.text
     assert '<p class="now">' in response.text
-    assert "<title>Alex Carter | BBA Finance &amp; ISBA</title>" in response.text
+    assert "<title>Ethan Jad | BBA Finance &amp; ISBA</title>" in response.text
 
 
 def test_homepage_hides_current_role_when_none_is_ongoing(monkeypatch):
     profile = seeded_profile()
+    for item in profile["experience"]:
+        item["details"] = item["details"].replace("Present", "Dec 2026")
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
 
     response = TestClient(app).get("/")
@@ -87,20 +89,61 @@ def test_resume_button_and_route_appear_only_when_pdf_exists(monkeypatch, tmp_pa
     served = client.get("/resume.pdf")
     assert served.status_code == 200
     assert served.headers["content-type"] == "application/pdf"
-    assert "Alex-Carter-Resume.pdf" in served.headers["content-disposition"]
+    assert "Ethan-Jad-Resume.pdf" in served.headers["content-disposition"]
     assert 'résumé <span class="button-note">PDF</span>' in client.get("/").text
 
 
 def test_empty_sections_are_hidden_instead_of_promising_content(monkeypatch):
+    profile = seeded_profile()
+    profile["experience"] = []
+    monkeypatch.setattr("app.main.get_profile", lambda: profile)
+
+    response = TestClient(app).get("/")
+
+    assert 'id="experience"' not in response.text
+    assert 'href="#experience"' not in response.text
+    assert "added soon" not in response.text
+
+
+def test_empty_projects_table_shows_a_deliberate_message(monkeypatch):
     profile = seeded_profile()
     profile["projects"] = []
     monkeypatch.setattr("app.main.get_profile", lambda: profile)
 
     response = TestClient(app).get("/")
 
-    assert 'id="projects"' not in response.text
-    assert 'href="#projects"' not in response.text
-    assert "added soon" not in response.text
+    assert response.status_code == 200
+    assert 'id="projects"' in response.text
+    assert "No projects are listed right now." in response.text
+    assert "temporarily unavailable" not in response.text
+
+
+def test_database_failure_returns_503_with_profile_visible_and_projects_unavailable(monkeypatch):
+    profile = seeded_profile()  # a successful read writes the snapshot
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://nobody@127.0.0.1:1/missing")
+
+    response = TestClient(app).get("/")
+
+    assert response.status_code == 503
+    assert "Ethan Jad" in response.text
+    assert "Financial Budgeting Intern" in response.text
+    assert "Projects temporarily unavailable" in response.text
+    for project in profile["projects"]:
+        assert project["title"] not in response.text
+
+
+def test_page_recovers_on_next_request_after_database_returns(monkeypatch, database_url):
+    initialize_database()
+    client = TestClient(app)
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://nobody@127.0.0.1:1/missing")
+    assert client.get("/").status_code == 503
+
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "Hoops Recap" in response.text
+    assert "temporarily unavailable" not in response.text
 
 
 def test_privacy_page_is_linked_from_the_footer_and_names_google_analytics():

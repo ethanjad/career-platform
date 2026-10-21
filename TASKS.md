@@ -4,13 +4,19 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 
 ## 1. Profile and project data
 
-- [ ] DB failure returns 503 and shows "Projects temporarily unavailable" with the profile still visible, not the snapshot — `app/main.py`, `app/database.py`, `templates/index.html`, test in `tests/test_public_profile.py`
-- [ ] Remove the invented "Alex Carter" content from the tracked snapshot and default/seed data — `data/profile_snapshot.json`, `app/database.py`
-- [ ] Empty projects table shows a deliberate message instead of hiding the section — `templates/index.html`, test in `tests/test_public_profile.py`
-- [ ] Explain the initial database choice (SQLite) and why — README "Decisions" section
+- [x] DB failure returns 503 and shows "Projects temporarily unavailable" with the profile still visible, not the snapshot — `app/main.py`, `app/database.py`, `templates/index.html`, test in `tests/test_public_profile.py`
+  - **Done 2026-10-21:** `/` answers 503 with the snapshot profile and "Projects temporarily unavailable" (no snapshot projects). 2 new tests, 33/33 pass on SQLite and PostgreSQL.
+- [x] Remove the invented "Alex Carter" content from the tracked snapshot and default/seed data — `data/profile_snapshot.json`, `app/database.py`
+  - **Done 2026-10-21:** default, seed and snapshot now hold the live ethanjad.me content. A test guards against the placeholder strings.
+- [x] Empty projects table shows a deliberate message instead of hiding the section — `templates/index.html`, test in `tests/test_public_profile.py`
+  - **Done 2026-10-21:** section stays and says "No projects are listed right now." Test added.
+- [x] Explain the initial database choice (SQLite) and why — README "Decisions" section
+  - **Drafted 2026-10-21:** README "Decisions → Starting with SQLite". Reasons inferred from the repo; Ethan to confirm.
 - [ ] Add a clearly labeled "this website, in progress" project entry — live DB row via `/admin/projects`, checked with `curl https://ethanjad.me/`
-- [ ] Record a dated DB-down → 503 → recovery-on-refresh check — new evidence file linked from `docs/project-1-submission.md`
-- [ ] Rewrite the README "Database fallback" section to match the new behaviour — `README.md`
+- [x] Record a dated DB-down → 503 → recovery-on-refresh check — new evidence file linked from `docs/project-1-submission.md`
+  - **Done 2026-10-21 (local PostgreSQL):** `docs/evidence/db-failure-503.md`, linked from the submission index.
+- [x] Rewrite the README "Database fallback" section to match the new behaviour — `README.md`
+  - **Done 2026-10-21:** now "Database failure behaviour".
 
 ## 2. Azure deployment
 

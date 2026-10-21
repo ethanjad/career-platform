@@ -12,7 +12,7 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Open port 8000. Without `DATABASE_URL`, a local SQLite database is created and seeded with demo profile content when the app starts.
+Open port 8000. Without `DATABASE_URL`, a local SQLite database is created and seeded with the same public profile content as the live site when the app starts.
 
 ## Admin updates
 
@@ -26,12 +26,38 @@ curl -X POST http://127.0.0.1:8000/admin/projects \
   -d '{"title":"Forecasting Model","summary":"Built a demand forecast."}'
 ```
 
-## Database fallback
+## Database failure behaviour
 
-After a successful database read or admin write, the app stores the last
-known-good public profile in `data/profile_snapshot.json`. If the database is
-unavailable, the public page serves that snapshot instead of a blank or error
-page. Keep this snapshot available in the deployed application.
+After every successful database read (including the one after each admin
+write), the app saves the public profile to `data/profile_snapshot.json`.
+
+If the database can't be reached when `/` is requested:
+
+- the page returns **HTTP 503**, so monitors and crawlers see that something is wrong
+- the profile (name, summary, experience, education, skills, links) still shows, read from the snapshot
+- the Projects section says **"Projects temporarily unavailable"** instead of showing old snapshot projects
+- the next request after the database comes back gets a normal 200 page; no restart is needed
+
+`/healthz` returns 503 `database unavailable` in the same situation, and the
+app still starts if the database is down at boot. If the projects table is
+empty while the database is up, the section stays on the page and says "No
+projects are listed right now."
+
+## Decisions
+
+### Starting with SQLite
+
+The first version stored everything in a SQLite file (`data/resume.db`). Why:
+
+- **One process, one machine.** The site ran as one FastAPI app on one Azure VM, so an in-process database file was enough. There was no separate database server to install, secure, or keep running.
+- **Small, rarely written data.** One profile and a few dozen rows, changed only through the admin API. SQLite's single-writer limit didn't matter.
+- **Simple backup and move.** Copying the data meant `sqlite3 .backup` and `scp`, which is how it moved from the laptop to the VM.
+
+The alternative was a managed PostgreSQL server from the start. That would
+have added cost and setup before the site needed it. SQLite stopped fitting
+when the site moved to Railway: container filesystems are rebuilt on each
+deploy, so the data needed a database outside the container (see the Railway
+section below).
 
 ## Deploying on Railway
 

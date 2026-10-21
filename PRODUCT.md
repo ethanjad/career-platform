@@ -57,7 +57,6 @@ From the résumé PDF (`(2.0 NEW Updated) 2026 Resume - Ethan Jad (1).pdf`):
 - **Projects:** Hoops Recap (co-founder, basketball media platform). Friends of Ballona Wetlands volunteer.
 - **Clubs:** ISBA Student Society, Sports Business Association, Finance Society, Accounting Society, Isang Bansa, Nikkei Student Union.
 - **Not available:** quantified outcomes or metrics, testimonials, project links or case studies. Do not invent any of these.
-- **Stale:** the repo's `data/profile_snapshot.json` still holds "Alex Carter" seed data, not Ethan's.
 
 ## Product Principles
 

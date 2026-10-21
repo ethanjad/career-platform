@@ -24,10 +24,10 @@ def test_startup_seeds_an_empty_database():
         response = client.get("/")
 
     # The built-in default profile has no experience rows, so this only appears if startup seeded the database.
-    assert "Data Analyst Intern" in response.text
+    assert "Financial Budgeting Intern" in response.text
 
 
-def test_app_starts_and_serves_snapshot_when_database_is_down_at_boot(monkeypatch):
+def test_app_starts_and_serves_503_page_when_database_is_down_at_boot(monkeypatch):
     initialize_database()
     load_public_profile()  # writes the snapshot
     monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://nobody@127.0.0.1:1/missing")
@@ -35,5 +35,6 @@ def test_app_starts_and_serves_snapshot_when_database_is_down_at_boot(monkeypatc
     with TestClient(app) as client:
         response = client.get("/")
 
-    assert response.status_code == 200
-    assert "Senior Business Analytics Student" in response.text
+    assert response.status_code == 503
+    assert "Ethan Jad" in response.text
+    assert "Projects temporarily unavailable" in response.text

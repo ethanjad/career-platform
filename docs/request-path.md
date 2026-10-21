@@ -4,7 +4,7 @@ Drafted 2026-10-20 with Claude Code from the repository records, as a study aid.
 
 - The Azure diagram shows the site as it ran until the Railway cutover on 2026-10-08.
 - On Railway, `start.sh` runs one uvicorn process. `--workers 2` was only on Azure.
-- On a database failure the app currently serves the saved snapshot with HTTP 200. Project 1 requires a 503 (see `TASKS.md`).
+- On a database failure the app answers 503. The profile comes from the saved snapshot and Projects shows "temporarily unavailable" ([evidence](evidence/db-failure-503.md)).
 
 ## 1. Azure: hardware and services
 
@@ -68,8 +68,8 @@ sequenceDiagram
   B->>W: GET / (encrypted)
   W->>A: GET / (plain HTTP, Azure: 127.0.0.1:8000 / Railway: $PORT)
   A->>D: read profile, experience, projects…
-  D-->>A: rows (or failure → snapshot today, should be 503)
-  A-->>W: 200 HTML
+  D-->>A: rows (or failure → snapshot profile, no projects)
+  A-->>W: 200 HTML (503 if the database failed)
   W-->>B: 200 HTML (encrypted)
   B->>W: GET /static/styles.css, font (same connection)
   B->>G: load gtag.js, send page_view

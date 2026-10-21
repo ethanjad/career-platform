@@ -19,11 +19,11 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # A database outage must not stop the site from serving its snapshot.
+    # A database outage must not stop the site from serving its 503 page.
     try:
         initialize_database()
     except SQLAlchemyError:
-        logger.exception("Database initialization failed; serving the snapshot until it recovers")
+        logger.exception("Database initialization failed; serving the 503 page until it recovers")
     yield
 
 
@@ -46,10 +46,12 @@ templates.env.filters["split_dates"] = split_dates
 
 @app.get("/", name="resume")
 def resume(request: Request):
+    profile = get_profile()
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"profile": get_profile(), "resume_available": settings.resume_pdf_path.is_file()},
+        context={"profile": profile, "resume_available": settings.resume_pdf_path.is_file()},
+        status_code=200 if profile["database_available"] else 503,
     )
 
 

@@ -60,8 +60,7 @@
         </div>
       </section>
 
-      <div class="shell content-grid{% if not (profile.experience or profile.projects) %} content-grid-single{% endif %}">
-        {% if profile.experience or profile.projects %}
+      <div class="shell content-grid">
         <div class="main-column">
           {% if profile.experience %}
           <section id="experience" class="section">
@@ -83,9 +82,13 @@
           </section>
           {% endif %}
 
-          {% if profile.projects %}
           <section id="projects" class="section">
             <h2>Projects &amp; Involvement</h2>
+            {% if not profile.database_available %}
+            <p class="section-note" role="status">Projects temporarily unavailable. Please refresh in a minute.</p>
+            {% elif not profile.projects %}
+            <p class="section-note">No projects are listed right now.</p>
+            {% else %}
             <ul class="schedule involvement">
               {% for project in profile.projects %}
               <li class="fixture">
@@ -96,10 +99,9 @@
               </li>
               {% endfor %}
             </ul>
+            {% endif %}
           </section>
-          {% endif %}
         </div>
-        {% endif %}
 
         <aside class="side-column">
           {% if profile.education %}

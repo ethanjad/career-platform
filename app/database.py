@@ -12,13 +12,16 @@ from .config import get_settings
 
 DEFAULT_PROFILE = {
     "id": 1,
-    "name": "Alex Carter",
-    "headline": "Senior Business Analytics Student",
-    "summary": (
-        "Business analytics student focused on turning complex data into clear decisions,"
-        " actionable insights, and measurable outcomes for organizations."
+    "name": "Ethan Jad",
+    "headline": (
+        "BBA in Finance and Information Systems & Business Analytics (ISBA) · Loyola Marymount University"
+        " · Class of 2027 · GPA 3.62 · Dean's List 4×"
     ),
-    "email": "alex.carter@example.com",
+    "summary": (
+        "A highly-driven Finance and ISBA student with strong analytical and problem-solving skills"
+        " with a passion for business development."
+    ),
+    "email": "ethanjad@gmail.com",
 }
 
 DEFAULT_PUBLIC_PROFILE = {
@@ -71,51 +74,77 @@ SEED_ROWS: dict[str, list[dict[str, Any]]] = {
     "profile": [{key: DEFAULT_PROFILE[key] for key in ("id", "name", "headline", "summary", "email")}],
     "experience": [
         {
-            "title": "Data Analyst Intern",
-            "company": "Northwind Retail",
-            "details": "Built SQL-based dashboards and KPI tracking for customer and merchandising data.",
+            "title": "Financial Budgeting Intern",
+            "company": "Student Housing Office, Loyola Marymount University",
+            "details": (
+                "Jun 2026 – Present. Conduct expense and inventory management representative of the LMU"
+                " housing department."
+            ),
         },
         {
-            "title": "Business Operations Assistant",
-            "company": "Civic Insights Group",
-            "details": "Supported forecasting, process improvement, and cross-functional reporting projects.",
+            "title": "Front Office Assistant",
+            "company": "Student Housing Office, Loyola Marymount University",
+            "details": (
+                "Aug 2025 – May 2026. First point of contact for students, parents, and staff by providing"
+                " information and resolving inquiries. Manage high volume of emails, phone calls, and"
+                " interactions with professionalism and efficiency."
+            ),
+        },
+        {
+            "title": "International Consulting Intern",
+            "company": "Lorawine Startup, Los Angeles, California",
+            "details": (
+                "Aug 2025 – Dec 2025. Creating data-based strategy for Lorawine, an Italian-based startup, in the"
+                " expansion to Napa, California, specialized in environmental and strategic positioning for entry"
+                " into the US market. Worked alongside Buonquillo International to seek competitive advantages"
+                " through the use of AI."
+            ),
+        },
+        {
+            "title": "Mentee",
+            "company": "Remote Job Shadowing Program, San Mateo, California",
+            "details": (
+                "May 2025 – Aug 2025. Paired with a finance professional through LMU's alumni network for"
+                " one-on-one mentorship. Engaged in biweekly, hour-long phone calls discussing industry insights"
+                " and professional development."
+            ),
         },
     ],
     "education": [
         {
-            "school": "Rensselaer Polytechnic Institute",
-            "degree": "Bachelor of Science",
-            "field": "Business Analytics",
-            "details": "Focus on data analysis, forecasting, and decision support systems.",
+            "school": "Loyola Marymount University",
+            "degree": "Bachelor of Business Administration",
+            "field": "ISBA and Finance",
+            "details": "Aug 2023 – Present · Los Angeles, California · GPA 3.62 · Dean's List (4x)",
         },
         {
-            "school": "University of Washington",
-            "degree": "Certificate",
-            "field": "Business Intelligence",
-            "details": "Completed coursework in SQL, Excel analytics, and data storytelling.",
+            "school": "Junipero Serra High School",
+            "degree": "High School Diploma",
+            "field": "CSF Seal Bearer",
+            "details": "Aug 2019 – May 2023 · San Mateo, California · GPA 3.87",
         },
     ],
     "skills": [
-        {"name": name, "category": category}
-        for name, category in (
-            ("SQL", "technical"),
-            ("Python", "technical"),
-            ("Excel", "technical"),
-            ("Power BI", "technical"),
-            ("Forecasting", "analytical"),
-            ("Data Visualization", "analytical"),
-            ("Stakeholder Communication", "business"),
-            ("Project Management", "business"),
-        )
+        {"name": name, "category": "technical"}
+        for name in ("Microsoft Office", "Google Suite", "MySQL Workbench", "Python")
     ],
     "projects": [
-        {"title": "Revenue Trend Dashboard", "summary": "Built an executive dashboard tracking revenue and funnel metrics."},
-        {"title": "Customer Retention Study", "summary": "Analyzed churn drivers and recommended actions for loyalty programs."},
+        {"title": "Sports Business Association", "summary": "Active club member."},
+        {"title": "Finance Society", "summary": "Active club member."},
+        {"title": "Hoops Recap", "summary": "Co-founder & content creator of a basketball media platform."},
+        {
+            "title": "Friends of Ballona Wetlands",
+            "summary": "Volunteer and active member of the environmentalist group (Aug 2025 – Present).",
+        },
+        {
+            "title": "Nikkei Student Union",
+            "summary": "Active club member and travel basketball player representing LMU.",
+        },
+        {"title": "ISBA Student Society", "summary": "Active club member."},
     ],
     "links": [
-        {"label": "LinkedIn", "url": "https://www.linkedin.com"},
-        {"label": "GitHub", "url": "https://github.com"},
-        {"label": "Portfolio", "url": "https://example.com"},
+        {"label": "LinkedIn", "url": "https://www.linkedin.com/in/ethanjad"},
+        {"label": "GitHub", "url": "https://github.com/ethanjad"},
     ],
     "settings": [{"id": 1, "site_title": "Career Platform", "profile_visible": 1}],
 }
@@ -183,7 +212,10 @@ def initialize_database() -> None:
 
 
 def load_public_profile() -> dict[str, Any]:
-    """Return live profile data when available, else the last known good snapshot."""
+    """Return live profile data, or the last known good snapshot without its projects when the database is down.
+
+    `database_available` tells the page which one it got, so it can answer 503 and say projects are unavailable.
+    """
     try:
         with get_engine().connect() as connection:
             profile_table = metadata.tables["profile"]
@@ -199,9 +231,10 @@ def load_public_profile() -> dict[str, Any]:
             settings_row = connection.execute(select(settings_table).where(settings_table.c.id == 1)).mappings().first()
             profile["settings"] = dict(settings_row) if settings_row else deepcopy(DEFAULT_PUBLIC_PROFILE["settings"])
         write_profile_snapshot(profile)
-        return profile
+        return {**profile, "database_available": True}
     except (SQLAlchemyError, OSError, RuntimeError):
-        return read_profile_snapshot()
+        # Projects come only from the live database; the snapshot keeps the rest of the profile visible.
+        return {**read_profile_snapshot(), "projects": [], "database_available": False}
 
 
 def get_profile() -> dict[str, Any]:
