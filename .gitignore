@@ -224,3 +224,6 @@ data/*.db
 *.pdf
 .DS_Store
 !data/resume.pdf
+
+# Cloudflare CLI cache (account details)
+.cloudflare/
