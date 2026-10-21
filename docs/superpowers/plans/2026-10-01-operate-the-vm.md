@@ -59,6 +59,11 @@ _(Add dated results here as each step runs.)_
     - The new font is served over HTTPS.
   - New route `/resume.pdf`: it serves `data/resume.pdf`, which must be a web-safe export with no phone or address. Until that file exists, the route returns `404` with a contact message, and the page hides the résumé button.
   - Still worth a look: `Allow-SSH-Laptop` (300) allows `135.225.24.52/32` (the VM's own IP) and `157.242.208.11/32`. Neither is the current laptop IP.
+- **2026-10-21, closed without the reboot test.**
+  - The activity log shows two events. On 2026-10-14 the auto-shutdown schedule deallocated the VM. On 2026-10-19 the VM, its NSG and the whole `rg-career-platform` group were deleted.
+  - The crash and reboot tests were never run.
+  - `Allow-SSH-Laptop` was never tightened. Its last recorded rules (2026-10-08, above) are the final ones.
+  - Write-up: [`docs/evidence/azure-vm-retired.md`](../../evidence/azure-vm-retired.md).
 
 ---
 

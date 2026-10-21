@@ -2,7 +2,7 @@
 
 ## Current setup (updated October 18, 2026)
 
-The site no longer runs on my Azure Virtual Machine. ethanjad.me is now hosted on Railway, and www.ethanjad.me is handled by Cloudflare, which redirects it to ethanjad.me. The VM is turned off and does not serve any traffic. The original write-up below describes the old VM setup.
+The site no longer runs on my Azure Virtual Machine. ethanjad.me is now hosted on Railway, and www.ethanjad.me is handled by Cloudflare, which redirects it to ethanjad.me. The VM was stopped by its auto-shutdown schedule on October 14 and deleted, with its whole resource group, on October 19, 2026 ([record](evidence/azure-vm-retired.md)). The original write-up below describes the old VM setup.
 
 **ethanjad.me (Railway).** My DNS record for ethanjad.me points to Railway. The certificate is issued by Let’s Encrypt (Intermediate CA “YR2”), covers ethanjad.me, and expires on January 6, 2027. Railway requests and renews this certificate automatically, so I no longer run certbot. Encryption begins in the visitor’s browser and ends at Railway’s edge proxy, which holds the private key. The proxy decrypts the request and passes it to my app inside Railway’s network. A visitor who uses http:// is redirected to https:// with a 301.
 

@@ -12,7 +12,8 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
   - **Done 2026-10-21:** section stays and says "No projects are listed right now." Test added.
 - [x] Explain the initial database choice (SQLite) and why — README "Decisions" section
   - **Drafted 2026-10-21:** README "Decisions → Starting with SQLite". Reasons inferred from the repo; Ethan to confirm.
-- [ ] Add a clearly labeled "this website, in progress" project entry — live DB row via `/admin/projects`, checked with `curl https://ethanjad.me/`
+- [x] Add a clearly labeled "this website, in progress" project entry — live DB row via `/admin/projects`, checked with `curl https://ethanjad.me/`
+  - **Done 2026-10-21 01:30 PDT:** `POST /admin/projects` → `{"ok":true}` 200. `curl https://ethanjad.me/` shows "ethanjad.me (this website, in progress)".
 - [x] Record a dated DB-down → 503 → recovery-on-refresh check — new evidence file linked from `docs/project-1-submission.md`
   - **Done 2026-10-21 (local PostgreSQL):** `docs/evidence/db-failure-503.md`, linked from the submission index.
 - [x] Rewrite the README "Database fallback" section to match the new behaviour — `README.md`
@@ -20,10 +21,14 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 
 ## 2. Azure deployment
 
-- [ ] Run and record a controlled VM restart (site responds, reads DB, services come back) — `docs/superpowers/plans/2026-10-01-operate-the-vm.md` progress log
-- [ ] Explain which configuration made the restart work (systemd enable, nginx, `--env-file`) — README Azure section
-- [ ] Tighten `Allow-SSH-Laptop` (VM's own IP and old IP) and record the final NSG rules — `az network nsg rule list` output in the VM plan
-- [ ] Confirm the VM is running and keep it running, then fix "The VM is turned off" — `az vm get-instance-view`, `docs/how-this-site-is-secured.md`
+- [x] Run and record a controlled VM restart (site responds, reads DB, services come back) — `docs/superpowers/plans/2026-10-01-operate-the-vm.md` progress log
+  - **Closed 2026-10-21 without a run:** the VM was deleted on 2026-10-19 before the test. Recorded honestly in `docs/evidence/azure-vm-retired.md` and the VM plan progress log.
+- [x] Explain which configuration made the restart work (systemd enable, nginx, `--env-file`) — README Azure section
+  - **Done 2026-10-21:** README "Azure VM" section, with the full table in `azure-vm-retired.md`.
+- [x] Tighten `Allow-SSH-Laptop` (VM's own IP and old IP) and record the final NSG rules — `az network nsg rule list` output in the VM plan
+  - **Closed 2026-10-21:** the NSG was deleted 2026-10-19, so the rule can no longer be tightened. The final rules (last recorded 2026-10-08) are in `azure-vm-retired.md`, which notes it was never tightened.
+- [x] Confirm the VM is running and keep it running, then fix "The VM is turned off" — `az vm get-instance-view`, `docs/how-this-site-is-secured.md`
+  - **Closed 2026-10-21 (you chose not to rebuild):** the VM was auto-shutdown 2026-10-14 and deleted 2026-10-19. "Turned off" now says deleted, linking the record.
 
 ## 3. Domain and HTTPS
 

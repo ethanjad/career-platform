@@ -59,6 +59,23 @@ when the site moved to Railway: container filesystems are rebuilt on each
 deploy, so the data needed a database outside the container (see the Railway
 section below).
 
+## Azure VM (2026-09-29 to 2026-10-08, deleted 2026-10-19)
+
+Before Railway, the site ran on an Ubuntu 24.04 VM in Azure (swedencentral):
+nginx on ports 80 and 443 proxied to uvicorn on `127.0.0.1:8000`, with the
+SQLite file in `data/`.
+
+**What made it survive restarts:**
+
+- The `career-platform` systemd service was **enabled**, so it started at every boot. It had `Restart=always` to come back after a crash.
+- Its `WorkingDirectory` was the repo, so it opened the real database.
+- It used `--env-file .env`, so the secrets loaded without anyone logging in.
+- nginx was enabled by its package and had a `Restart=on-failure` drop-in.
+
+A full reboot test was never run before the VM was deleted. See
+[azure-vm-retired.md](docs/evidence/azure-vm-retired.md) for what was tested,
+the final firewall (NSG) rules, and the shutdown and deletion record.
+
 ## Deploying on Railway
 
 The `web` service deploys `main` with `railway.json` (start: `start.sh`,
@@ -85,3 +102,5 @@ list. Exercise write-ups:
 - [Exercise 03: Azure VM deployment](docs/evidence/ex03.md)
 - [Exercise 05: DNS failure investigation (simulation)](docs/evidence/ex05.md)
 - [How this site is secured (HTTPS)](docs/how-this-site-is-secured.md)
+- [Azure VM: restart setup, final NSG rules, retirement](docs/evidence/azure-vm-retired.md)
+- [Database down → 503 → recovery](docs/evidence/db-failure-503.md)
