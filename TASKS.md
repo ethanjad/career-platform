@@ -2,6 +2,22 @@
 
 Audit of 2026-10-20 against the Project 1 requirements. Each line names the file or check that closes it.
 
+## Resume here (left 2026-10-21 ~01:55 PDT)
+
+Railway was mid-incident: builds paused ("Builds are temporarily paused") and the Postgres public proxy failing TLS. First check that both are back:
+
+- `curl -s https://status.railway.com/ | grep -i paused` prints nothing.
+- A `psycopg.connect($RAILWAY_DATABASE_URL)` succeeds.
+
+Then:
+
+1. `git push origin main`, then `railway redeploy --from-source -y` if no deploy starts within a minute. Confirm `SUCCESS` for the tip of `main`, then check live:
+   - `/` returns 200 with the real profile
+   - `HEAD /` returns 200
+2. Fill in the Deployment and After sections of `docs/evidence/reviewed-change-head.md`, then tick section 5.
+3. Run the source-vs-target comparison (the export `~/Desktop/github/resume.db.bak-railway-20261008-214832` against live Postgres, read-only). Add it to the migration plan's progress log, then tick the last two section 4 items.
+4. Continue with sections 6, 7, 8 and Other. Section 8: keep ex03 **and** add `docs/evidence/railway-deploy-failures.md`.
+
 ## 1. Profile and project data
 
 - [x] DB failure returns 503 and shows "Projects temporarily unavailable" with the profile still visible, not the snapshot — `app/main.py`, `app/database.py`, `templates/index.html`, test in `tests/test_public_profile.py`
