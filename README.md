@@ -2,6 +2,30 @@
 
 A recruiter-facing FastAPI, Jinja, and PostgreSQL résumé site (SQLite for local development).
 
+**Live site:** https://ethanjad.me. `https://www.ethanjad.me` redirects to it. It's hosted on Railway, with DNS on Cloudflare, email on Zoho Mail and analytics in Google Analytics 4.
+
+## Updating the live site
+
+**Code, templates or styles.** Pushing to `main` is the deploy:
+
+1. **Make the change and run the tests:** `uv run pytest`. Optionally run them against Postgres with `TEST_DATABASE_URL` (see "Deploying on Railway").
+2. **Commit and push:** `git push origin main`.
+3. **Railway deploys it.** Railway builds the new commit and starts it. It only moves traffic to the new container once `/healthz` answers `ok`, so a build that can't reach the database never goes live.
+4. **Check it live:** `curl -s https://ethanjad.me/healthz`, then open the page. Undo with `git revert` (see "Rollback").
+
+**Content** (experience, projects, skills, links). Use the admin API against the live site. No deploy is needed:
+
+```bash
+curl -X POST https://ethanjad.me/admin/projects \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Secret: $ADMIN_SECRET" \
+  -d '{"title":"…","summary":"…"}'
+```
+
+`PUT /admin/<table>/<id>` edits a row and `DELETE` removes one. The same API runs locally (next section).
+
+**Résumé PDF.** Replace `data/resume.pdf` with the web-safe export (no phone number or home address), then commit and push.
+
 ## Run in Codespaces
 
 ```bash
@@ -25,6 +49,29 @@ curl -X POST http://127.0.0.1:8000/admin/projects \
   -H "X-Admin-Secret: replace-with-a-long-random-secret" \
   -d '{"title":"Forecasting Model","summary":"Built a demand forecast."}'
 ```
+
+## Architecture
+
+Diagrams:
+
+- [docs/request-path.md](docs/request-path.md), with PNG copies in `docs/request-path-*.png`:
+  - Azure as it was
+  - the order of events for one page load
+  - Railway today: web and analytics, and email
+- [docs/azure-architecture.md](docs/azure-architecture.md): the Azure setup step by step, including updates, restarts, email and analytics.
+
+| Path | From → to | Protocol / port | Where |
+|---|---|---|---|
+| Name lookup | browser or mail server → Cloudflare DNS | DNS, UDP/TCP 53 | Cloudflare global anycast |
+| Web page | browser → Railway edge | HTTPS, TCP 443 (80 only redirects) | Railway, region `sfo` |
+| Inside Railway | edge → web container → Postgres | HTTP on `$PORT`, then the Postgres protocol over the private network | Railway |
+| `www` | browser → Cloudflare | HTTPS 443 / HTTP 80, 301 to the apex | Cloudflare |
+| Analytics | browser → `googletagmanager.com`, `google-analytics.com` | HTTPS, TCP 443 | Google |
+| Mail in | sender's server → `mx.zoho.com` | SMTP, TCP 25 | Zoho (US) |
+| Mail out | Zoho `165.173.180.0/24` → receiver | SMTP, TCP 25, TLS 1.3 (observed) | Zoho (US) |
+| *Azure, until 2026-10-08* | browser → NSG → nginx → uvicorn → SQLite file | HTTPS 443 / HTTP 80, then `127.0.0.1:8000`, then a file read | Azure Sweden Central |
+
+Email and analytics never pass through the web host. They were set up after the move to Railway.
 
 ## Database failure behaviour
 
@@ -58,6 +105,31 @@ have added cost and setup before the site needed it. SQLite stopped fitting
 when the site moved to Railway: container filesystems are rebuilt on each
 deploy, so the data needed a database outside the container (see the Railway
 section below).
+
+### Moving from the Azure VM to Railway
+
+**Chosen:** Railway (managed containers) with Railway's managed PostgreSQL. Migrated on 2026-10-08.
+
+| Option | For | Against |
+|---|---|---|
+| **Stay on the Azure VM** | Full control. Already working. Teaches the whole stack (OS, nginx, systemd, firewall, TLS). | I patch the OS, renew certificates, keep SSH safe and watch disk and memory on a 1 GiB VM. Deploying was `ssh` + `git pull` + restart, by hand. SQLite on one disk with hand-made backups. Cost about $5 of student credit by Oct 21 (see "Costs"). |
+| **Azure App Service + Azure Database for PostgreSQL** | Managed, and in the same cloud as before. | More services to configure and secure, and a managed Postgres server costs noticeably more than the site needs. |
+| **Railway** ✅ | Deploys on every push to `main`, gated by `/healthz`. TLS certificates are automatic. Postgres is one click away on a private network. No OS or web server to maintain. | Less control and visibility. A trial plan with an end date. Logs aren't kept long: the Oct 8 failure logs were gone by Oct 21. A provider outage on 2026-10-21–22 paused all deploys, and there was nothing I could do but wait. |
+
+**Why Railway:** the site is small and changes often, so automatic deploys and certificates matter more than server control. The VM had already taught the server side. Moving to Railway also replaced the SQLite file with a real database service. The trade-off showed up during Railway's Oct 21–22 outage, when the site stayed up but couldn't be updated.
+
+### Managed email (Zoho Mail) vs running my own mail server
+
+**Chosen:** Zoho Mail's free plan for `ethan@ethanjad.me`, set up on 2026-10-13.
+
+| Option | For | Against |
+|---|---|---|
+| **Self-hosted** (Postfix + Dovecot on the VM) | Full control, no third party reading mail. | Azure blocks outbound port 25 on most subscriptions, so the VM couldn't send mail directly anyway. A new server IP has no sending reputation, so mail tends to land in spam. Spam filtering, TLS certificates, DKIM signing, backups and uptime are all mine. Railway can't receive mail on port 25 at all. |
+| **Forwarding only** (Cloudflare Email Routing) | Free, nothing to run. Mail to `@ethanjad.me` goes to Gmail. | Receives only. Replies would come from Gmail, not `ethanjad.me`, so the domain wouldn't pass SPF/DKIM/DMARC as the sender. |
+| **Google Workspace** | Familiar Gmail interface. | Paid per user per month. |
+| **Zoho Mail (free)** ✅ | Free for a custom domain. Zoho runs the MX servers, spam filtering, sending reputation and DKIM signing. | A third party holds the mail. 5 GB limit and a web or app client only on the free plan (no IMAP). |
+
+**Why Zoho:** a personal address on my own domain needs to *send* mail that lands in inboxes. Sending reputation and DKIM are the hard parts of running mail, and Zoho does both for free. The [header check](docs/evidence/zoho-header-check.md) shows the result: SPF, DKIM and DMARC all pass at Gmail.
 
 ## Azure VM (2026-09-29 to 2026-10-08, deleted 2026-10-19)
 
@@ -173,6 +245,62 @@ The old Azure VM was deleted on 2026-10-19. A rollback to Azure now means
 rebuilding it from the [VM plan](docs/superpowers/plans/2026-10-01-operate-the-vm.md)
 before step 3.
 
+## Failures and fixes
+
+### 1. Railway deploys failed during the migration (app/database, 2026-10-08)
+
+Full record: [railway-deploy-failures.md](docs/evidence/railway-deploy-failures.md).
+
+- **Symptom:** the first three Railway deployments (21:27, 21:30 and 22:08 UTC) were marked `FAILED`. The site stayed on the Azure VM.
+- **Checks:** `railway deployment list` showed what each deploy built: commits `a7b5899` and `3f89893`, triggered by setting up the service and by a push. `git show <sha>:<file>` showed what `main` held at those commits.
+- **Diagnosis:** Railway was connected to `main` before the migration branch was merged. Those commits had no `railway.json`, no Postgres driver, no `DATABASE_URL` support and no Python pin, so they were the old SQLite-only app. The build logs had expired by the time this was written up, so the exact error isn't known.
+- **Fix:** merging `railway-postgres` into `main` (`7ca25e5`). Its deploy succeeded.
+- **Repeat check:** every deploy since has succeeded. On 2026-10-21, `/healthz` returned `ok` and the real profile was served (migration plan progress log).
+
+### 2. Choosing the VM's size and region (Azure, 2026-09)
+
+Write-up in my own words: [ex03.md §3](docs/evidence/ex03.md#3-troubleshooting).
+
+- **What happened:** the VM was created in Sweden Central before I had picked a size, region and price.
+- **Why it stayed:** by the time I wanted US Central, the VM was already running and working. I kept it and accepted slower response times and a slightly higher price.
+
+### 3. DNS/TLS failure after a migration (simulation)
+
+**Simulation:** [ex05.md](docs/evidence/ex05.md) uses the course's supplied outputs, not my live domain.
+
+- **Symptom:** `curl` failed with `(60) certificate subject name does not match`.
+- **Diagnosis:** a stale DNS `A` record still pointed at the old VM, which served the old certificate.
+- **Fix:** replace the `A` record with a `CNAME` to Railway.
+
+## Costs, cleanup and limitations
+
+### What it costs
+
+| Service | Plan | Cost so far |
+|---|---|---|
+| Azure (VM, disk, public IP), Sep – Oct 19 | Azure for Students credit | **$5.00** of credit: storage $2.07, virtual network / IP $2.93, VM compute $0.00 (free allowance). From the Cost Management API, 2026-10-22. |
+| Railway (web + Postgres) | Trial | $0.61 for Oct 5–21 (`railway usage`). **Trial end date: _to confirm in the Railway dashboard_.** |
+| Cloudflare DNS + `www` redirect | Free | $0 |
+| Zoho Mail | Free (5 GB, one domain) | $0 |
+| Google Analytics 4 | Free | $0 |
+| Domain `ethanjad.me` | Namecheap, registered 2026-10-01, **expires 2027-10-01** | _to confirm_ |
+
+### Cleanup plan
+
+- **Azure, done 2026-10-19:** the VM, disk, IP, NSG and the whole `rg-career-platform` group were deleted. Only `NetworkWatcherRG`, created automatically by Azure and free, remains.
+- **Railway, before the trial ends:** either move to a paid plan, or export the database with `copy_database` (see "Rollback") and move the site off Railway before the trial lapses.
+- **Domain, before 2027-10-01:** renew it, or let it go. If it lapses, the site, email and certificates all stop.
+- **Secrets:** rotate `ADMIN_SECRET` and the Postgres password once Railway publishes guidance on its 2026-10-21 security incident.
+
+### Remaining limitations
+
+- **One app process and one database, with no replicas.** A Railway outage takes the site down, and during the 2026-10-21–22 incident deploys were paused for more than a day.
+- **Backups are manual.** Nothing exports Postgres on a schedule.
+- **DMARC only reports.** It's `p=none`, so forged mail from `ethanjad.me` is reported, not blocked.
+- **No consent banner.** Analytics are blocked by many content blockers, so GA4 under-counts.
+- **Old deploy logs aren't kept.** The Oct 8 build logs were already gone when I looked on Oct 21, so failures have to be recorded on the day.
+- **The admin API is the only way to edit content.** It's protected by a single shared secret, with no admin UI and no audit log.
+
 ## Project 1 evidence
 
 See [docs/project-1-submission.md](docs/project-1-submission.md) for the full
@@ -186,3 +314,5 @@ list. Exercise write-ups:
 - [Azure VM: restart setup, final NSG rules, retirement](docs/evidence/azure-vm-retired.md)
 - [Database down → 503 → recovery](docs/evidence/db-failure-503.md)
 - [DNS records, www redirect and certificates](docs/evidence/dns-and-https.md)
+- [Railway deploy failures during the migration](docs/evidence/railway-deploy-failures.md)
+- [Architecture diagrams](docs/request-path.md) · [Azure step by step](docs/azure-architecture.md)
