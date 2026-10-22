@@ -82,7 +82,8 @@ Then:
 
 - [x] Create the Zoho header analysis — `docs/evidence/zoho-header-check.md`
   - **Done 2026-10-22:** full received-copy headers (Zoho → Gmail), hop table, SPF/DKIM/DMARC with the records each used, ARC, and limits. Gmail address and home IPv6 redacted.
-- [ ] Add the before-MX message line and what happened to it — `docs/evidence/ex06.md`
+- [x] Add the before-MX message line and what happened to it — `docs/evidence/ex06.md`
+  - **Done 2026-10-22:** sent 14:20 from the LMU account, MX created 14:36–14:37, mailbox 14:41:22, delivered 14:41:46. Delayed, not bounced. Timeline and explanation in `ex06.md` §1.
 - [x] Record and explain the MX, SPF, DKIM and DMARC records — dated DNS output plus an explanation in `docs/evidence/ex06.md` or the README
   - **Done 2026-10-22:** `ex06.md` §2, "The DNS records behind these results": dated `dig` output, what each record does, how it maps to the header results, and an SPF include chain shown to cover the sending IP.
 - [x] Link ex06 and the header check from the README and submission index — `README.md`, `docs/project-1-submission.md`
