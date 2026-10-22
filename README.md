@@ -180,6 +180,7 @@ list. Exercise write-ups:
 
 - [Exercise 03: Azure VM deployment](docs/evidence/ex03.md)
 - [Exercise 05: DNS failure investigation (simulation)](docs/evidence/ex05.md)
+- [Exercise 06: Zoho email (SPF, DKIM, DMARC) and Google Analytics](docs/evidence/ex06.md)
 - [How this site is secured (HTTPS)](docs/how-this-site-is-secured.md)
 - [Azure VM: restart setup, final NSG rules, retirement](docs/evidence/azure-vm-retired.md)
 - [Database down → 503 → recovery](docs/evidence/db-failure-503.md)

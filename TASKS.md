@@ -82,7 +82,8 @@ Then:
 
 - [ ] Create the Zoho header analysis — `docs/evidence/zoho-header-check.md`
 - [ ] Add the before-MX message line and what happened to it — `docs/evidence/ex06.md`
-- [ ] Record and explain the MX, SPF, DKIM and DMARC records — dated DNS output plus an explanation in `docs/evidence/ex06.md` or the README
+- [x] Record and explain the MX, SPF, DKIM and DMARC records — dated DNS output plus an explanation in `docs/evidence/ex06.md` or the README
+  - **Done 2026-10-22:** `ex06.md` §2, "The DNS records behind these results": dated `dig` output, what each record does, how it maps to the header results, and an SPF include chain shown to cover the sending IP.
 - [ ] Link ex06 and the header check from the README and submission index — `README.md`, `docs/project-1-submission.md`
 
 ## 7. GA4
