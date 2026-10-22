@@ -91,7 +91,8 @@ Then:
 
 ## 7. GA4
 
-- [ ] Explain how a browser event reaches GA4, why the outbound click is useful, and what the checks prove — `docs/evidence/ex06.md` section 3
+- [x] Explain how a browser event reaches GA4, why the outbound click is useful, and what the checks prove — `docs/evidence/ex06.md` section 3
+  - **Done 2026-10-22:** `ex06.md` §3 adds the 6-step path, a headless-Chrome capture of the real `page_view` and outbound `click` hits (answered locally, nothing sent), why the click is the site's conversion signal, and what the checks do and don't prove.
 
 ## 8. Engineering record
 
