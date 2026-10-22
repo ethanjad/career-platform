@@ -287,7 +287,7 @@ I learned an abundance about the parts that make up the web application, such as
 | Service | Plan | Cost so far |
 |---|---|---|
 | Azure (VM, disk, public IP), Sep – Oct 19 | Azure for Students credit | **$5.00** of credit: storage $2.07, virtual network / IP $2.93, VM compute $0.00 (free allowance). From the Cost Management API, 2026-10-22. |
-| Railway (web + Postgres) | Trial | $0.61 for Oct 5–21 (`railway usage`). **Trial end date: _to confirm in the Railway dashboard_.** |
+| Railway (web + Postgres) | Trial | $0.61 for Oct 5–21 (`railway usage`). **$4.34 of trial credit left, 14 days remaining on 2026-10-22, so the trial ends about 2026-11-05** (Railway dashboard). |
 | Cloudflare DNS + `www` redirect | Free | $0 |
 | Zoho Mail | Free (5 GB, one domain) | $0 |
 | Google Analytics 4 | Free | $0 |
@@ -296,7 +296,7 @@ I learned an abundance about the parts that make up the web application, such as
 ### Cleanup plan
 
 - **Azure, done 2026-10-19:** the VM, disk, IP, NSG and the whole `rg-career-platform` group were deleted. Only `NetworkWatcherRG`, created automatically by Azure and free, remains.
-- **Railway, before the trial ends:** either move to a paid plan, or export the database with `copy_database` (see "Rollback") and move the site off Railway before the trial lapses.
+- **Railway, before about 2026-11-05 (trial end):** either move to a paid plan, or export the database with `copy_database` (see "Rollback") and move the site off Railway before the trial lapses. If the trial lapses, the site goes down.
 - **Domain, before 2027-10-01:** renew it, or let it go. If it lapses, the site, email and certificates all stop.
 - **Secrets:** rotate `ADMIN_SECRET` and the Postgres password once Railway publishes guidance on its 2026-10-21 security incident.
 

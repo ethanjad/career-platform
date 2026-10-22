@@ -111,8 +111,8 @@ Then:
   - **Done 2026-10-22:** "Failures and fixes" §3, labeled simulation.
 - [x] README: reflection — `README.md`
   - **Done 2026-10-22:** Ethan's own words, with typos fixed and split into paragraphs.
-- [ ] README: service costs or credits, Railway trial end date, cleanup plan, remaining limitations — `README.md`
-  - **Partly done 2026-10-22:** Azure $5.00 of credit (Cost Management API), Railway $0.61, free tiers, domain expiry 2027-10-01, cleanup plan and limitations. Domain: $0 via the GitHub Student Pack (confirmed 2026-10-22). **Open:** the Railway trial end date.
+- [x] README: service costs or credits, Railway trial end date, cleanup plan, remaining limitations — `README.md`
+  - **Partly done 2026-10-22:** Azure $5.00 of credit (Cost Management API), Railway $0.61, free tiers, domain expiry 2027-10-01, cleanup plan and limitations. Domain: $0 via the GitHub Student Pack (confirmed 2026-10-22). Railway trial: $4.34 left, 14 days on 2026-10-22, ending about 2026-11-05 (from Ethan, Railway dashboard).
 - [ ] Submission index: repo URL, live URL, final commit SHA, and links for all 8 required items — `docs/project-1-submission.md`
   - **Built 2026-10-22:** repo and live URLs, the 8 required items each with their evidence links, and the README part-by-part table. 51 links checked, 0 broken. **Open:** the final commit SHA, after the push (Railway outage).
 
