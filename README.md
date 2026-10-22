@@ -272,6 +272,14 @@ Write-up in my own words: [ex03.md §3](docs/evidence/ex03.md#3-troubleshooting)
 - **Diagnosis:** a stale DNS `A` record still pointed at the old VM, which served the old certificate.
 - **Fix:** replace the `A` record with a `CNAME` to Railway.
 
+## Reflection
+
+One thing that surprised me was the ease of Railway in comparison to Azure. On Azure I had to keep editing the inbound network rules to accommodate my new IP address. On Railway there is no server to SSH into, so there are no rules like that to maintain.
+
+One thing I would do differently is deploy the Azure VM in a different region, preferably one closer to where I am located. I originally deployed it in Sweden because Claude proceeded without my approval. This may have caused background delays and lagging.
+
+I learned an abundance about the parts that make up the web application, such as Uvicorn, FastAPI, Jinja, and SQLite. By taking all of the knowledge that I have learned, I now have the confidence to understand the behind-the-scenes activity that occurs when visiting a website, or when establishing a website myself.
+
 ## Costs, cleanup and limitations
 
 ### What it costs
@@ -283,7 +291,7 @@ Write-up in my own words: [ex03.md §3](docs/evidence/ex03.md#3-troubleshooting)
 | Cloudflare DNS + `www` redirect | Free | $0 |
 | Zoho Mail | Free (5 GB, one domain) | $0 |
 | Google Analytics 4 | Free | $0 |
-| Domain `ethanjad.me` | Namecheap, registered 2026-10-01, **expires 2027-10-01** | _to confirm_ |
+| Domain `ethanjad.me` | Namecheap via the GitHub Student Pack, registered 2026-10-01, **expires 2027-10-01** | $0 for the first year. Renewal is at Namecheap's normal price. |
 
 ### Cleanup plan
 

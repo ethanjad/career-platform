@@ -27,7 +27,7 @@ Then:
 - [x] Empty projects table shows a deliberate message instead of hiding the section — `templates/index.html`, test in `tests/test_public_profile.py`
   - **Done 2026-10-21:** section stays and says "No projects are listed right now." Test added.
 - [x] Explain the initial database choice (SQLite) and why — README "Decisions" section
-  - **Drafted 2026-10-21:** README "Decisions → Starting with SQLite". Reasons inferred from the repo; Ethan to confirm.
+  - **Drafted 2026-10-21:** README "Decisions → Starting with SQLite". Reasons inferred from the repo; **confirmed by Ethan 2026-10-22.**
 - [x] Add a clearly labeled "this website, in progress" project entry — live DB row via `/admin/projects`, checked with `curl https://ethanjad.me/`
   - **Done 2026-10-21 01:30 PDT:** `POST /admin/projects` → `{"ok":true}` 200. `curl https://ethanjad.me/` shows "ethanjad.me (this website, in progress)".
 - [x] Record a dated DB-down → 503 → recovery-on-refresh check — new evidence file linked from `docs/project-1-submission.md`
@@ -103,15 +103,16 @@ Then:
 - [x] README: how the migration preserved data and which responsibilities moved — `README.md`
   - **Done 2026-10-21** in section 4 (README "Moving from Azure to Railway").
 - [x] README: two decisions with alternatives (Railway migration, managed vs self-hosted email) — `README.md`
-  - **Drafted 2026-10-22:** Railway migration and Zoho vs self-hosted email, each with an options table. The "Why" lines are inferred; Ethan to confirm.
+  - **Drafted 2026-10-22:** Railway migration and Zoho vs self-hosted email, each with an options table. The "Why" lines were inferred; **confirmed by Ethan 2026-10-22.**
 - [x] README: an app/DB failure with symptom, checks, diagnosis, fix and repeat check (ex03's is a sizing story, so consider a Railway migration failure) — `README.md` linking the record
   - **Done 2026-10-22:** README "Failures and fixes": Railway deploy failures (full record) **and** ex03, both included as asked.
   - **Decided 2026-10-21:** keep ex03 and add the Oct 8 Railway deploy failures (with their logs) alongside it. Both are included.
 - [x] README: link the DNS/TLS failure, labeled as a simulation — `README.md` linking `docs/evidence/ex05.md`
   - **Done 2026-10-22:** "Failures and fixes" §3, labeled simulation.
-- [ ] README: reflection — `README.md`
+- [x] README: reflection — `README.md`
+  - **Done 2026-10-22:** Ethan's own words, with typos fixed and split into paragraphs.
 - [ ] README: service costs or credits, Railway trial end date, cleanup plan, remaining limitations — `README.md`
-  - **Partly done 2026-10-22:** Azure $5.00 of credit (Cost Management API), Railway $0.61, free tiers, domain expiry 2027-10-01, cleanup plan and limitations. **Open:** the Railway trial end date and the domain cost (Ethan).
+  - **Partly done 2026-10-22:** Azure $5.00 of credit (Cost Management API), Railway $0.61, free tiers, domain expiry 2027-10-01, cleanup plan and limitations. Domain: $0 via the GitHub Student Pack (confirmed 2026-10-22). **Open:** the Railway trial end date.
 - [ ] Submission index: repo URL, live URL, final commit SHA, and links for all 8 required items — `docs/project-1-submission.md`
 
 ## Other
