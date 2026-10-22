@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Visitors reach the site at `http://135.225.24.52/`. *(Superseded 2026-10-06: Certbot made the site HTTPS-only at `https://ethanjad.me/` and `https://www.ethanjad.me/`. `http://135.225.24.52/` now returns `404`; see the 2026-10-08 Progress log entry.)* The app starts on boot, restarts itself after a crash, runs as `azureuser`, and port 8000 stays private.
+**Goal:** Visitors reach the site at `http://<VM_PUBLIC_IP>/`. *(Superseded 2026-10-06: Certbot made the site HTTPS-only at `https://ethanjad.me/` and `https://www.ethanjad.me/`. `http://<VM_PUBLIC_IP>/` now returns `404`; see the 2026-10-08 Progress log entry.)* The app starts on boot, restarts itself after a crash, runs as `azureuser`, and port 8000 stays private.
 
 **Architecture:** A systemd service named `career-platform` runs uvicorn with 2 worker processes on `127.0.0.1:8000`. nginx listens on public port 80 and passes each request to `127.0.0.1:8000`. The Azure firewall (NSG) allows port 80 and has no rule for port 8000.
 
@@ -12,14 +12,16 @@
 
 ## VM details (found 2026-10-01 with read-only `az` commands)
 
+_IP addresses in this plan were replaced with placeholders on 2026-10-22: `<VM_PUBLIC_IP>` for the VM (released when it was deleted on 2026-10-19), and `<LAPTOP_IP_date>` for the laptop's public IP on each date._
+
 | Item | Value |
 |---|---|
 | VM | `vm-career-platform` in resource group `rg-career-platform`, region swedencentral |
 | Size / OS | Standard_B2ats_v2 (2 vCPUs, 1 GiB RAM) / Ubuntu 24.04 LTS |
-| Public IP | `135.225.24.52` (no DNS name) |
-| SSH | `ssh career-vm`, which is `azureuser@135.225.24.52` with key `~/.ssh/isba4775_azure`. Password login is off. |
+| Public IP | `<VM_PUBLIC_IP>` (no DNS name) |
+| SSH | `ssh career-vm`, which is `azureuser@<VM_PUBLIC_IP>` with key `~/.ssh/isba4775_azure`. Password login is off. |
 | NSG `vm-career-platformNSG` | `Allow-SSH-Laptop` (300, port 22, old laptop IP), **`Allow-HTTP-80` (310, port 80, from anyone)**, `AllowSSHFromMyIP` (1000, port 22, current laptop IP). There is no rule for port 8000. |
-| NSG as of 2026-10-08 | `Allow-SSH-Laptop` (300, port 22, from `135.225.24.52/32` and `157.242.208.11/32`), `Allow-HTTP-80` (310, port 80, `*`), `Allow-HTTPS-443` (320, port 443, `*`), `AllowSSHFromMyIP` (1000, port 22, `162.231.193.100/32`). Still no rule for port 8000. |
+| NSG as of 2026-10-08 | `Allow-SSH-Laptop` (300, port 22, from `<VM_PUBLIC_IP>/32` and `<LAPTOP_IP_2026-09-24>/32`), `Allow-HTTP-80` (310, port 80, `*`), `Allow-HTTPS-443` (320, port 443, `*`), `AllowSSHFromMyIP` (1000, port 22, `<LAPTOP_IP_2026-10-08>/32`). Still no rule for port 8000. |
 | App on the VM | Code is in `/home/azureuser/career-platform`, the Python environment is `.venv/`, the database is `data/resume.db`, and secrets are in `.env`. Right now uvicorn is started by hand (`nohup setsid`) on `0.0.0.0:8000`. |
 
 **Note:** an `Allow-HTTP-80` rule already exists, at priority **310** rather than the 320 you planned. Task 3 checks that rule instead of creating it. If you'd rather have it at 320, change its priority in the portal. Don't add a second rule with the same name.
@@ -47,9 +49,9 @@ _(Add dated results here as each step runs.)_
 - **2026-10-01, Task 0 done (read-only, nothing changed).** All checks matched the expected results. Details are under Task 0.
 - **2026-10-01, Task 1 done.** The hand-started uvicorn is stopped. The `career-platform` service is enabled and active, running as `azureuser` with 2 workers on `127.0.0.1:8000`. All Step 4 checks matched. Details are under Task 1.
 - **2026-10-01, Task 2 done.** nginx 1.24.0 is installed. It serves the site on port 80 of the VM and passes requests to `127.0.0.1:8000`. The Ubuntu default page is turned off, and an auto-restart setting is added. All Step 4 checks matched. Details are under Task 2.
-- **2026-10-01, Task 3 done. All tasks are complete.** From the laptop, `http://135.225.24.52/` returns `200` with the real resume page and port 8000 is blocked. The site is served by nginx on port 80 and the `career-platform` service on `127.0.0.1:8000`. Both start at boot, both restart after a crash, and the app runs as `azureuser`. Still to do (by you): the crash and reboot tests (see Known limits). Also worth a look: `Allow-SSH-Laptop` now allows the VM's own IP (see Task 3).
+- **2026-10-01, Task 3 done. All tasks are complete.** From the laptop, `http://<VM_PUBLIC_IP>/` returns `200` with the real resume page and port 8000 is blocked. The site is served by nginx on port 80 and the `career-platform` service on `127.0.0.1:8000`. Both start at boot, both restart after a crash, and the app runs as `azureuser`. Still to do (by you): the crash and reboot tests (see Known limits). Also worth a look: `Allow-SSH-Laptop` now allows the VM's own IP (see Task 3).
 - **2026-10-08, deploy of `0508faf` (recruiter-first homepage).**
-  - SSH from the laptop timed out because the laptop IP had changed. With the owner's OK, `AllowSSHFromMyIP` went from `157.242.208.233/32` to `162.231.193.100/32` (replaced, not added). No other rule changed.
+  - SSH from the laptop timed out because the laptop IP had changed. With the owner's OK, `AllowSSHFromMyIP` went from `<LAPTOP_IP_2026-09-29>/32` to `<LAPTOP_IP_2026-10-08>/32` (replaced, not added). No other rule changed.
   - On the VM, these backups were made before the pull: `data/resume.db.bak-predeploy-20261008-045830` and `~/profile_snapshot.json.bak-predeploy-20261008-045830`.
   - `git pull --ff-only origin main` went from `3d23e09` to `0508faf`, then `sudo systemctl restart career-platform`. The service came back `active` with no errors in the journal.
   - Left untouched: `.env`, `data/resume.db`, the VM's live `data/profile_snapshot.json`, nginx, Certbot/HTTPS and DNS.
@@ -58,7 +60,7 @@ _(Add dated results here as each step runs.)_
     - `http://ethanjad.me/` returns `301` to HTTPS.
     - The new font is served over HTTPS.
   - New route `/resume.pdf`: it serves `data/resume.pdf`, which must be a web-safe export with no phone or address. Until that file exists, the route returns `404` with a contact message, and the page hides the résumé button.
-  - Still worth a look: `Allow-SSH-Laptop` (300) allows `135.225.24.52/32` (the VM's own IP) and `157.242.208.11/32`. Neither is the current laptop IP.
+  - Still worth a look: `Allow-SSH-Laptop` (300) allows `<VM_PUBLIC_IP>/32` (the VM's own IP) and `<LAPTOP_IP_2026-09-24>/32`. Neither is the current laptop IP.
 - **2026-10-21, closed without the reboot test.**
   - The activity log shows two events. On 2026-10-14 the auto-shutdown schedule deallocated the VM. On 2026-10-19 the VM, its NSG and the whole `rg-career-platform` group were deleted.
   - The crash and reboot tests were never run.
@@ -308,10 +310,10 @@ Expected: `Allow-HTTP-80` is present, and no rule mentions `8000`.
 
 Runs on: **Laptop**
 ```bash
-curl -s -o /dev/null -w "port80 %{http_code}\n" --max-time 10 http://135.225.24.52/
-curl -s -o /dev/null -w "port8000 %{http_code}\n" --max-time 10 http://135.225.24.52:8000/ || true
+curl -s -o /dev/null -w "port80 %{http_code}\n" --max-time 10 http://<VM_PUBLIC_IP>/
+curl -s -o /dev/null -w "port8000 %{http_code}\n" --max-time 10 http://<VM_PUBLIC_IP>:8000/ || true
 ```
-Expected: `port80 200` and `port8000 000`, which means blocked. Also open `http://135.225.24.52/` in a browser and confirm the resume page loads with its styles.
+Expected: `port80 200` and `port8000 000`, which means blocked. Also open `http://<VM_PUBLIC_IP>/` in a browser and confirm the resume page loads with its styles.
 
 - [x] **Step 3: Record the results**
 
@@ -323,12 +325,12 @@ What ran: the read-only `az network nsg rule list` command, then the two `curl` 
 
 What the checks showed:
 - **Step 1:** `Allow-HTTP-80` exists: priority 310, Inbound, Allow, TCP, port 80, source `*`. No rule mentions port 8000.
-  - **Changed since the morning:** `Allow-SSH-Laptop` (300, port 22) now has source `135.225.24.52/32`, the VM's own public IP. Earlier today it was the old laptop IP. This session didn't change it.
+  - **Changed since the morning:** `Allow-SSH-Laptop` (300, port 22) now has source `<VM_PUBLIC_IP>/32`, the VM's own public IP. Earlier today it was the old laptop IP. This session didn't change it.
   - `AllowSSHFromMyIP` (1000, port 22, the current laptop IP) is unchanged.
 - **Step 2:**
   - `port80 200` and `port8000 000` (blocked).
   - Extra checks: `css 200`, and the page title is `Ethan Jad | Finance and ISBA Student at Loyola Marymount University`. The count of `Alex Carter` and `Welcome to nginx` is `0`.
-  - Screenshot of `http://135.225.24.52/` (1280×1600, saved in this session's scratch folder, not the repo): the full resume page renders with its styles. That's the header, the hero section, Experience, Skills and Education.
+  - Screenshot of `http://<VM_PUBLIC_IP>/` (1280×1600, saved in this session's scratch folder, not the repo): the full resume page renders with its styles. That's the header, the hero section, Experience, Skills and Education.
 - **Step 3:** the boxes are ticked and these results are recorded.
 
 ---

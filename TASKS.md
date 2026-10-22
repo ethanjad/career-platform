@@ -117,5 +117,7 @@ Then:
 
 ## Other
 
-- [ ] Redact the VM and laptop IPs from the public repo — `docs/superpowers/plans/2026-10-01-operate-the-vm.md`
-- [ ] Commit or ignore the untracked review screenshots — `.impeccable/review/`
+- [x] Redact the VM and laptop IPs from the public repo — `docs/superpowers/plans/2026-10-01-operate-the-vm.md`
+  - **Done 2026-10-22:** the VM plan now uses `<VM_PUBLIC_IP>` and dated `<LAPTOP_IP_…>` placeholders, with a note. Earlier this session: the diagrams and `dns-before-zoho.md`. **ex03.md keeps the VM IP by Ethan's choice** (submitted answer; the VM is deleted and its IP released). Older commits in git history still contain these IPs; history was not rewritten.
+- [x] Commit or ignore the untracked review screenshots — `.impeccable/review/`
+  - **Done 2026-10-22:** committed by Ethan's choice (Oct 19 design review; no private data, though the footer copy is now outdated).
