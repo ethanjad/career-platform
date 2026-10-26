@@ -2,7 +2,7 @@
 
 - **Live site:** https://ethanjad.me (`https://www.ethanjad.me` redirects there)
 - **Repository:** https://github.com/ethanjad/career-platform
-- **Final commit:** _filled in after the last push to `main`. Railway deploys were paused by a Railway outage on 2026-10-21–22._
+- **Final commit:** [`de5fc00eb413f0618be3ebd21c9e0a2a6d019c9d`](https://github.com/ethanjad/career-platform/commit/de5fc00eb413f0618be3ebd21c9e0a2a6d019c9d). Deployed to Railway as `c1e32d22-fa0a-4aae-a7fb-024f7c9ebd04` (`SUCCESS`, 2026-10-25 20:37 PDT). The only commit after it adds this line.
 - **Engineering record:** [README.md](../README.md)
 
 ## The 8 required items
