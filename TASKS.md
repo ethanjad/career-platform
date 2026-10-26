@@ -2,18 +2,11 @@
 
 Audit of 2026-10-20 against the Project 1 requirements. Each line names the file or check that closes it.
 
-## Resume here (updated 2026-10-22 ~01:20 PDT)
+## Status (2026-10-25)
 
-Everything not blocked by Railway is done (35 ticked). Four items are open, and all four wait on Railway's 2026-10-21–22 outage: builds paused, the Postgres public proxy failing TLS, and the CLI logged out. The local commits are not pushed yet.
+All items done. Railway's 2026-10-21–22 outage held up the last deploy until 2026-10-25, when it went out as deployment `44a560db`. The final commit SHA is recorded in `docs/project-1-submission.md`.
 
-1. **Check Railway is back.** `curl -s https://status.railway.com/ | grep -i "paused"` prints nothing, and `psycopg.connect($RAILWAY_DATABASE_URL)` succeeds.
-2. **Log in:** Ethan runs `! railway login` (interactive).
-3. **Push and deploy.** `git push origin main`, then `railway redeploy --from-source -y` if no deploy starts within a minute. Confirm `SUCCESS` for the tip of `main`. Live checks: `/` returns 200 with the real profile, `HEAD /` returns 200, and `/healthz` returns `ok`.
-4. **§5:** fill in the Deployment and After sections of `docs/evidence/reviewed-change-head.md` with the deployment ID and status, and note that the deployed commit contains `556fb8f`. Then tick it.
-5. **§4:** compare `~/Desktop/github/resume.db.bak-railway-20261008-214832` with live Postgres, read-only (counts, ids, identical/changed rows). Add the result to the migration plan's progress log, then tick both items.
-6. **§8:** commit, push, then put the final SHA in `docs/project-1-submission.md` (the "Final commit" line) and tick it.
-
-**Railway trial ends about 2026-11-05.** Decide on a paid plan or a move before then.
+**Still to decide:** the Railway trial ends about **2026-11-05**. Either move to a paid plan, or export the database and move the site before then.
 
 ## 1. Profile and project data
 
@@ -113,8 +106,8 @@ Everything not blocked by Railway is done (35 ticked). Four items are open, and 
   - **Done 2026-10-22:** Ethan's own words, with typos fixed and split into paragraphs.
 - [x] README: service costs or credits, Railway trial end date, cleanup plan, remaining limitations — `README.md`
   - **Partly done 2026-10-22:** Azure $5.00 of credit (Cost Management API), Railway $0.61, free tiers, domain expiry 2027-10-01, cleanup plan and limitations. Domain: $0 via the GitHub Student Pack (confirmed 2026-10-22). Railway trial: $4.34 left, 14 days on 2026-10-22, ending about 2026-11-05 (from Ethan, Railway dashboard).
-- [ ] Submission index: repo URL, live URL, final commit SHA, and links for all 8 required items — `docs/project-1-submission.md`
-  - **Built 2026-10-22:** repo and live URLs, the 8 required items each with their evidence links, and the README part-by-part table. 51 links checked, 0 broken. **Open:** the final commit SHA, after the push (Railway outage).
+- [x] Submission index: repo URL, live URL, final commit SHA, and links for all 8 required items — `docs/project-1-submission.md`
+  - **Built 2026-10-22:** repo and live URLs, the 8 required items each with their evidence links, and the README part-by-part table. 51 links checked, 0 broken. Final SHA recorded 2026-10-25 after the last deploy.
 
 ## Other
 
