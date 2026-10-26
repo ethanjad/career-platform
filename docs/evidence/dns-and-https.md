@@ -2,6 +2,36 @@
 
 DNS for `ethanjad.me` is hosted on Cloudflare (nameservers `kristin.ns.cloudflare.com`, `scott.ns.cloudflare.com`). The records before email was added are in [dns-before-zoho.md](dns-before-zoho.md).
 
+## Domain control (captured 2026-10-25 21:00 PDT)
+
+How control works:
+
+1. **I register the domain.** `ethanjad.me` is registered to me at Namecheap, through the GitHub Student Pack.
+2. **The registrar delegates DNS to Cloudflare.** At Namecheap I set the domain's nameservers to the two Cloudflare servers assigned to my account.
+3. **Cloudflare answers for the domain.** It accepted the zone (status *active*), and every record below is managed in my Cloudflare account.
+
+Three independent sources agree:
+
+```
+$ whois ethanjad.me            (registry and registrar, abridged)
+Domain Name: ethanjad.me
+Registrar: NameCheap, Inc.
+Creation Date: 2026-10-01T01:39:32Z
+Registry Expiry Date: 2027-10-01T01:39:32Z
+Domain Status: clientTransferProhibited
+Name Server: kristin.ns.cloudflare.com
+Name Server: scott.ns.cloudflare.com
+
+$ dig +short NS ethanjad.me @1.1.1.1      (what the public internet sees)
+kristin.ns.cloudflare.com.
+scott.ns.cloudflare.com.
+
+$ cf zones list                           (my Cloudflare account)
+ethanjad.me | status active | plan Free Website | name_servers ['kristin.ns.cloudflare.com', 'scott.ns.cloudflare.com'] | activated 2026-10-01T21:58:52
+```
+
+**`clientTransferProhibited`** is the registrar lock, which stops the domain being moved to another registrar without my action. The registration runs to **2027-10-01** and must be renewed before then (README "Costs, cleanup and limitations").
+
 ## Current records (captured 2026-10-21 01:36 PDT)
 
 Captured with `cf dns records list --zone ethanjad.me` (`cf` 1.0.0-beta.16) and shown one record per line. `TTL` is `1` (Auto) for every record.

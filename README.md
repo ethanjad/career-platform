@@ -144,6 +144,17 @@ SQLite file in `data/`.
 - It used `--env-file .env`, so the secrets loaded without anyone logging in.
 - nginx was enabled by its package and had a `Restart=on-failure` drop-in.
 
+**SSH and network rules.** All of these are recorded in the [VM plan](docs/superpowers/plans/2026-10-01-operate-the-vm.md).
+
+- **SSH by key only.** Login was `azureuser` with a private key on my laptop (`ssh career-vm`, an alias in `~/.ssh/config`). Password login was off, so a guessed password couldn't get in.
+- **NSG, Azure's firewall in front of the VM.** It allowed:
+  - TCP 80 and 443 from anyone, for the website
+  - TCP 22 only from my laptop's current public IP (`AllowSSHFromMyIP`)
+
+  Everything else was denied by Azure's default rules. **Port 8000 had no rule**, so the app was never directly reachable.
+- **Defence in depth.** uvicorn also listened only on `127.0.0.1:8000`, so even with an NSG mistake, only nginx on the same machine could reach it. `ufw` on the VM was inactive, so the NSG was the only filter.
+- **The cost of the SSH rule.** My laptop's public IP changed between sessions (home, campus, Wi-Fi), so SSH timed out until I updated `AllowSSHFromMyIP`. The one recorded case was on 2026-10-08. A leftover rule, `Allow-SSH-Laptop`, still allowed two stale IPs and was never tightened. [ex03 §4](docs/evidence/ex03.md#4-the-change) explains the trade-off of opening SSH to another network.
+
 A full reboot test was never run before the VM was deleted. See
 [azure-vm-retired.md](docs/evidence/azure-vm-retired.md) for what was tested,
 the final firewall (NSG) rules, and the shutdown and deletion record.
@@ -173,6 +184,26 @@ Plan and progress log:
 There was no separate design spec for this move. The plan was written from
 the request and from what inspecting the app found, and those findings are
 listed at the top of the plan.
+
+**Dependency inventory.** Everything the app relied on on the VM, and how each was handled on Railway. It's drawn from the plan's "Findings", made by inspecting the app and the VM on 2026-10-08.
+
+| Dependency | On the Azure VM | On Railway | How it was handled |
+|---|---|---|---|
+| Database engine | SQLite file `data/resume.db`, raw `sqlite3` calls (`?` placeholders, `INSERT OR IGNORE`, `AUTOINCREMENT`, `sqlite_master`) | Railway PostgreSQL 18 | Database layer rewritten on SQLAlchemy Core; one schema for both engines |
+| Connection setting | `DATABASE_PATH` | `DATABASE_URL = ${{Postgres.DATABASE_URL}}` (private network) | `postgres://` / `postgresql://` rewritten to `postgresql+psycopg://` (tested) |
+| Live data | On the VM only (1 profile, 4 experience, 2 education, 4 skills, 2 projects, 1 link) | Postgres | `sqlite3 .backup`, then `copy_database` keeping ids, then sequences reset (tested) |
+| Id sequences | SQLite `AUTOINCREMENT` | Postgres sequences | Moved past max(id) after the copy and seed, so admin inserts don't collide (tested on Postgres) |
+| Python runtime | 3.12 venv on the VM (laptop 3.14) | Railpack image | Pinned with `.python-version` = 3.12 |
+| Python packages | `fastapi`, `jinja2`, `uvicorn`, `httpx`, `pytest` | the same, plus `sqlalchemy`, `psycopg[binary]` | Added to `requirements.txt` and `uv.lock` |
+| Process start | systemd unit: uvicorn, 2 workers, `127.0.0.1:8000`, `--env-file .env` | `start.sh`: uvicorn on `$PORT`, 1 process | `railway.json` start command |
+| Secrets and config | `.env` on the VM (`ADMIN_SECRET`, `ENABLE_FALLBACK`, `HOST`, `PORT`) | Railway variables | New `ADMIN_SECRET`; `PORT` provided by Railway; `HOST` and `DATABASE_PATH` not set |
+| TLS and reverse proxy | nginx + Certbot | Railway edge | `--proxy-headers`, so `url_for` builds `https://` asset links behind the proxy |
+| Résumé PDF | Copied to the VM by hand (git-ignored) | no hand-placed files | Web-safe PDF committed as `data/resume.pdf` |
+| Fallback snapshot | `data/profile_snapshot.json`, kept on disk | disk wiped every deploy | Rewritten on the first successful read; `/healthz` makes that read before traffic switches |
+| Startup work | `initialize_database` on every request | — | Moved to app startup |
+| Health check | none | `/healthz` (503 if the database is unreachable) | Gates each deploy |
+| DNS | `A` record → VM IP | `CNAME` → Railway (flattened) + `TXT _railway-verify` | Switched at cutover (timeline in the plan) |
+| Templates, static files, fonts | in the repo | in the repo | unchanged, served by the app |
 
 **How the data was preserved:**
 

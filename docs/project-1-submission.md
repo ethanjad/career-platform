@@ -4,6 +4,7 @@
 - **Repository:** https://github.com/ethanjad/career-platform
 - **Final commit (submitted):** [`359c167ca102c386476eeb29edd38d3c7038b1b8`](https://github.com/ethanjad/career-platform/commit/359c167ca102c386476eeb29edd38d3c7038b1b8). Deployed to Railway as `1abb2326-7f08-4481-a7f0-158bacf443e2` (`SUCCESS`, 2026-10-25 20:55 PDT). The only commit after it writes this line and the status in `TASKS.md`. It can't contain its own SHA.
 - **Engineering record:** [README.md](../README.md)
+- **History:** [commit history](https://github.com/ethanjad/career-platform/commits/main), and the dated plans with progress logs in [`docs/superpowers/plans/`](superpowers/plans/) (Azure VM, VM operations, Railway migration). [`TASKS.md`](../TASKS.md) is the gap checklist used to finish the project.
 
 ## Checked before submitting (2026-10-25 20:53 PDT, logged out of GitHub)
 
@@ -37,20 +38,20 @@
 
 ### 2. Azure deployment
 
-- [README: Azure VM](../README.md#azure-vm-2026-09-29-to-2026-10-08-deleted-2026-10-19): what made it survive restarts.
+- [README: Azure VM](../README.md#azure-vm-2026-09-29-to-2026-10-08-deleted-2026-10-19): what made it survive restarts, plus **SSH and network rules** (key-only SSH, NSG ports, why 8000 stayed closed).
 - [ex03.md](evidence/ex03.md): VM details, screenshot and troubleshooting.
 - [azure-vm-retired.md](evidence/azure-vm-retired.md): the restart configuration, the final NSG rules, and the shutdown and deletion record. The reboot test was never run.
 - [VM operations plan and progress log](superpowers/plans/2026-10-01-operate-the-vm.md)
 
 ### 3. Domain and HTTPS
 
-- [dns-and-https.md](evidence/dns-and-https.md): all current DNS records and what each is for, the `www` → root redirect checks, and certificates.
+- [dns-and-https.md](evidence/dns-and-https.md): **domain control** (whois, registrar lock, nameserver delegation to Cloudflare), all current DNS records and what each is for, the `www` → root redirect checks, and certificates.
 - [dns-before-zoho.md](evidence/dns-before-zoho.md): the records before email was added.
 - [how-this-site-is-secured.md](how-this-site-is-secured.md)
 
 ### 4. Railway and PostgreSQL migration
 
-- [README: Moving from Azure to Railway and PostgreSQL](../README.md#moving-from-azure-to-railway-and-postgresql-2026-10-08): how the data was preserved, and the responsibility table.
+- [README: Moving from Azure to Railway and PostgreSQL](../README.md#moving-from-azure-to-railway-and-postgresql-2026-10-08): the **dependency inventory**, database compatibility, how the data was preserved, and the responsibility table.
 - [postgres-credential-rotation.md](evidence/postgres-credential-rotation.md): the Postgres password rotated after Railway's 2026-10-21 security incident (timeline, downtime, before/after audit).
 - [README: Rollback](../README.md#rollback): code, database, and leaving Railway while keeping data written after cutover.
 - [Migration plan and progress log](superpowers/plans/2026-10-08-railway-postgres-migration.md): the export, the cutover timeline and the post-cutover checks. There was no separate spec; the plan was written from the request and the findings at its top.
