@@ -30,6 +30,7 @@
 ### 4. Railway and PostgreSQL migration
 
 - [README: Moving from Azure to Railway and PostgreSQL](../README.md#moving-from-azure-to-railway-and-postgresql-2026-10-08): how the data was preserved, and the responsibility table.
+- [postgres-credential-rotation.md](evidence/postgres-credential-rotation.md): the Postgres password rotated after Railway's 2026-10-21 security incident (timeline, downtime, before/after audit).
 - [README: Rollback](../README.md#rollback): code, database, and leaving Railway while keeping data written after cutover.
 - [Migration plan and progress log](superpowers/plans/2026-10-08-railway-postgres-migration.md): the export, the cutover timeline and the post-cutover checks. There was no separate spec; the plan was written from the request and the findings at its top.
 
