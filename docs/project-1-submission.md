@@ -2,7 +2,7 @@
 
 - **Live site:** https://ethanjad.me (`https://www.ethanjad.me` redirects there)
 - **Repository:** https://github.com/ethanjad/career-platform
-- **Final commit:** [`86f4def21b2c01c11153ca93be6454df982951c3`](https://github.com/ethanjad/career-platform/commit/86f4def21b2c01c11153ca93be6454df982951c3). Deployed to Railway as `c73e34b3-a723-4b17-bbdf-ab696c46cef2` (`SUCCESS`, 2026-10-25 20:51 PDT). The only commit after it updates this line and the status in `TASKS.md`.
+- **Final commit (submitted):** [`359c167ca102c386476eeb29edd38d3c7038b1b8`](https://github.com/ethanjad/career-platform/commit/359c167ca102c386476eeb29edd38d3c7038b1b8). Deployed to Railway as `1abb2326-7f08-4481-a7f0-158bacf443e2` (`SUCCESS`, 2026-10-25 20:55 PDT). The only commit after it writes this line and the status in `TASKS.md`. It can't contain its own SHA.
 - **Engineering record:** [README.md](../README.md)
 
 ## Checked before submitting (2026-10-25 20:53 PDT, logged out of GitHub)
@@ -10,7 +10,7 @@
 - **Repository:** the repository and the commit page open publicly (HTTP 200).
 - **Evidence files:** all 17 linked files exist on GitHub at the submitted commit.
 - **Live site:** `https://ethanjad.me/`, `http://ethanjad.me/`, `https://www.ethanjad.me/` and `http://www.ethanjad.me/` all end at `https://ethanjad.me/` with HTTP 200 and a valid certificate.
-- **Same version:** the live deployment's app code is identical to the submitted commit. Later commits change only this file and one status line in `TASKS.md`.
+- **Same version:** the live deployment's app code is identical to the submitted commit. The app code hasn't changed since commit `556fb8f`.
 
 ## What I could not verify
 
