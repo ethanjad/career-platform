@@ -5,6 +5,27 @@
 - **Final commit:** [`86f4def21b2c01c11153ca93be6454df982951c3`](https://github.com/ethanjad/career-platform/commit/86f4def21b2c01c11153ca93be6454df982951c3). Deployed to Railway as `c73e34b3-a723-4b17-bbdf-ab696c46cef2` (`SUCCESS`, 2026-10-25 20:51 PDT). The only commit after it updates this line and the status in `TASKS.md`.
 - **Engineering record:** [README.md](../README.md)
 
+## Checked before submitting (2026-10-25 20:53 PDT, logged out of GitHub)
+
+- **Repository:** the repository and the commit page open publicly (HTTP 200).
+- **Evidence files:** all 17 linked files exist on GitHub at the submitted commit.
+- **Live site:** `https://ethanjad.me/`, `http://ethanjad.me/`, `https://www.ethanjad.me/` and `http://www.ethanjad.me/` all end at `https://ethanjad.me/` with HTTP 200 and a valid certificate.
+- **Same version:** the live deployment's app code is identical to the submitted commit. Later commits change only this file and one status line in `TASKS.md`.
+
+## What I could not verify
+
+| Item | Why | Where it's recorded |
+|---|---|---|
+| A reboot test of the Azure VM | Never run before the VM was deleted on 2026-10-19 | [azure-vm-retired.md](evidence/azure-vm-retired.md) |
+| The exact error behind the Oct 8 Railway deploy failures | Railway's build logs had expired by Oct 21. Cause inferred from the repository state. | [railway-deploy-failures.md](evidence/railway-deploy-failures.md) |
+| The `copy_database` output and the post-cutover checks on Oct 8 itself | Not saved on the day. The data was compared row by row on Oct 25, and the checks were re-run on Oct 21. | [migration plan, progress log](superpowers/plans/2026-10-08-railway-postgres-migration.md#progress-log) |
+| TLS and SPF/DKIM/DMARC results for mail *into* Zoho (Gmail → Zoho) | Only the sender's copy was available. The Zoho → Gmail direction is fully verified. | [zoho-header-check.md](evidence/zoho-header-check.md) |
+| Microsoft's individual retry attempts for the message sent before MX existed | Microsoft's queue isn't visible. Send and arrival times are recorded. | [ex06.md §1](evidence/ex06.md) |
+| That GA4 received the hits from the Oct 22 browser capture | Sending was blocked on purpose. GA4 receipt is shown by the Oct 18 Realtime screenshots instead. That GA4 doesn't store IPs is Google's claim. | [ex06.md §3](evidence/ex06.md#3-live-site-and-google-analytics) |
+| Railway region for the current deploy, and the Postgres private port | Region `sfo` comes from the Oct 8 deployment manifests. The port isn't exposed in any record. | [request-path.md](request-path.md) |
+| The README's database backup/restore steps through a temporary TCP proxy | Not run since Railway removed the public proxy. A read-only `railway ssh` check was run instead. | [README: Rollback](../README.md#rollback) |
+| The origin of one `127.0.0.1` database session after the password rotation | It comes from inside the Postgres container, most likely Railway's own tooling | [postgres-credential-rotation.md](evidence/postgres-credential-rotation.md) |
+
 ## The 8 required items
 
 ### 1. Profile and project data, with database failure behaviour
