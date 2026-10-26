@@ -71,7 +71,8 @@ Everything not blocked by Railway is done (35 ticked). Four items are open, and 
 
 ## 5. Reviewed change through Railway
 
-- [ ] Record one change: commit SHA → Railway deployment ID → behaviour seen at ethanjad.me — evidence file linked from the submission index
+- [x] Record one change: commit SHA → Railway deployment ID → behaviour seen at ethanjad.me — evidence file linked from the submission index
+  - **Done 2026-10-25:** `556fb8f` (in `390ef02`) → deployment `44a560db` SUCCESS → `HEAD /` 405 → 200 live. `docs/evidence/reviewed-change-head.md`.
 - [x] Rollback for code and database changes — README rollback section
   - **Done 2026-10-21:** README "Rollback → Code / Database" (revert + push, dashboard redeploy, `copy_database` backup/restore).
 
