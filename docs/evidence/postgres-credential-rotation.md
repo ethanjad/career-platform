@@ -48,6 +48,6 @@ Both audits ran inside the web container (`railway ssh --service career-platform
 
 ## Not done, or still open
 
-- **`ADMIN_SECRET`:** _to be rotated._ Its value was shown in a working session's tool output on 2026-10-25, and the incident is reason enough on its own. Generating it and setting it on Railway needs the owner to run the command. See the README cleanup plan.
-- **The stale local `RAILWAY_DATABASE_URL`:** _to be removed_ from `.env`. It points at the removed proxy and holds the old password.
+- **`ADMIN_SECRET`:** **not rotated, by my decision (2026-10-25).** It wasn't part of Railway's database guidance. Its value appeared once in a local working session's output on 2026-10-25, not in the repository or anywhere public. It can be rotated later with `railway variable set ADMIN_SECRET --stdin --skip-deploys`, then a `--from-source` redeploy.
+- **The stale local `RAILWAY_DATABASE_URL`:** left in `.env`. It points at the removed proxy and holds the old password, which no longer works, so it's harmless.
 - **Database errors aren't logged.** The app catches them to serve the 503 page but doesn't log why. During the outage the old container's log showed 503s and no `password authentication failed` line, so the cause had to be inferred from the timing.

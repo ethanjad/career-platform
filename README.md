@@ -305,7 +305,7 @@ I learned an abundance about the parts that make up the web application, such as
 - **Azure, done 2026-10-19:** the VM, disk, IP, NSG and the whole `rg-career-platform` group were deleted. Only `NetworkWatcherRG`, created automatically by Azure and free, remains.
 - **Railway, before about 2026-11-05 (trial end):** either move to a paid plan, or export the database with `copy_database` (see "Rollback") and move the site off Railway before the trial lapses. If the trial lapses, the site goes down.
 - **Domain, before 2027-10-01:** renew it, or let it go. If it lapses, the site, email and certificates all stop.
-- **Secrets:** the Postgres password was rotated on 2026-10-25, following Railway's guidance after its 2026-10-21 security incident ([record](docs/evidence/postgres-credential-rotation.md)). `ADMIN_SECRET` is still to be rotated.
+- **Secrets:** the Postgres password was rotated on 2026-10-25, following Railway's guidance after its 2026-10-21 security incident ([record](docs/evidence/postgres-credential-rotation.md)). `ADMIN_SECRET` was not rotated (my decision). It wasn't covered by Railway's guidance and was never exposed publicly.
 
 ### Remaining limitations
 
