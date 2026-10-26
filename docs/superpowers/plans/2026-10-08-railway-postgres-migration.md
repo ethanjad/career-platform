@@ -23,11 +23,26 @@ _The steps below were carried out on 2026-10-08, but the boxes were never ticked
 ### Copy (Task 6 Step 5)
 
 - The `copy_database` output from 2026-10-08 wasn't saved. Since the script prints the source row counts, it would have matched the counts above.
-- Source-vs-target comparison: _pending. The Railway Postgres public proxy was failing TLS handshakes on 2026-10-21 during a Railway incident. To be filled in when it's reachable._
+- **Source vs target, checked 2026-10-25.** The Postgres public TCP proxy no longer exists: Railway removed it during its 2026-10-21–22 incident. So the live rows were read *inside* the web container with `railway ssh`, through a read-only transaction (`SET TRANSACTION READ ONLY`) over the private network. Each row was compared field by field with the export.
+
+  | Table | Export (ids) | Live | Result |
+  |---|---|---|---|
+  | profile | 1 (1) | 1 | identical |
+  | experience | 4 (3–6) | 4 | all 4 identical, same ids |
+  | education | 2 (3, 4) | 2 | both identical, same ids |
+  | skills | 4 (17–20) | 4 | all 4 identical, same ids |
+  | projects | 2 (5, 6) | 7 | ids 5, 6 present but **edited** after cutover; 7–11 **added** |
+  | links | 1 (7) | 2 | id 7 identical; 8 (GitHub) **added** |
+  | settings | 1 (1) | 1 | identical |
+
+  - **Copied intact:** every exported row is in Postgres under the same id, and nothing is missing. All rows not edited later are byte-for-byte identical.
+  - **Real use since the move:** after cutover, projects 5 and 6 were renamed through the admin API, from "Hoops Recap" and "Friends of Ballona Wetlands" to "Sports Business Association" and "Finance Society". Those two were then re-added as 7 and 8, and four more rows were added: 9, 10, 11 (the "this website, in progress" entry, 2026-10-21) and link 8. The database has been in real use on Railway since the move.
+  - **Sequences:** `experience` 6, `projects` 11, `links` 8. Each equals its table's highest id, so the next admin insert gets max(id)+1 (Review Focus 2).
+  - **The page:** on 2026-10-25, `https://ethanjad.me/` showed these 7 projects and the real profile, with no seed content.
 
 ### Real data that seeding couldn't reproduce
 
-Seeding numbers rows from 1. The exported data has experience ids 3–6, projects 5–6 and link 7, because the demo rows were deleted and real ones added on the VM. Its headline is the "Class of 2027" edit, and its link is `https://www.linkedin.com/in/ethanjad`. None of this is in any seed. Live ids: _see the comparison above, pending._
+Seeding numbers rows from 1. The exported data has experience ids 3–6, projects 5–6 and link 7, because the demo rows were deleted and real ones added on the VM. Its headline is the "Class of 2027" edit, and its link is `https://www.linkedin.com/in/ethanjad`. None of this is in any seed. **Confirmed in live Postgres on 2026-10-25:** experience 3–6, link 7 and the "Class of 2027" headline are there unchanged. A re-seed would have produced ids 1–4 and 1–2.
 
 ### Cutover (Task 7)
 

@@ -54,9 +54,11 @@ Everything not blocked by Railway is done (35 ticked). Four items are open, and 
 
 ## 4. Railway and PostgreSQL migration
 
-- [ ] Record the export, copy counts, and the source-vs-target record, content and page comparison — progress log in `docs/superpowers/plans/2026-10-08-railway-postgres-migration.md`
+- [x] Record the export, copy counts, and the source-vs-target record, content and page comparison — progress log in `docs/superpowers/plans/2026-10-08-railway-postgres-migration.md`
+  - **Done 2026-10-25:** row-by-row comparison read via `railway ssh` (read-only, private network; the public proxy is gone). Every exported row is present with the same id; unedited rows are identical. In the plan's progress log.
   - **Partly done 2026-10-21:** export identified (VM copy, 21:48 UTC) and its counts are recorded in the plan's progress log. The source-vs-target comparison is waiting on the Railway Postgres public proxy (Railway incident).
-- [ ] Show one real change to the original data that seed data couldn't reproduce — same progress log
+- [x] Show one real change to the original data that seed data couldn't reproduce — same progress log
+  - **Done 2026-10-25:** non-seed ids and the headline confirmed live. Also recorded: projects 5–6 edited and 7–11 and link 8 added after cutover.
   - **Partly done 2026-10-21:** the export's non-seed ids (experience 3–6, projects 5–6, link 7) and the "Class of 2027" headline are recorded. Confirming them in live Postgres is waiting on the same proxy.
 - [x] Record the cutover and the post-cutover checks (Task 7 Step 5 results) — same progress log
   - **Done 2026-10-21:** cutover timeline rebuilt from Railway, Cloudflare and certificate timestamps. Step 5 wasn't recorded on the day, so it was re-run today and the output logged. Both are noted honestly in the plan.
