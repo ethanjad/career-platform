@@ -4,7 +4,7 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 
 ## Status (2026-10-25)
 
-All items done. Railway's 2026-10-21–22 outage held up deploys until 2026-10-25. The submitted commit is `359c167` (deployment `1abb2326`, `SUCCESS`), after the post-incident Postgres password rotation and the pre-submission checks. It's recorded in `docs/project-1-submission.md`.
+All items done. Railway's 2026-10-21–22 outage held up deploys until 2026-10-25. The submitted commit is `5252820` (deployment `e8cb7374`, `SUCCESS`), after the post-incident Postgres password rotation, the pre-submission checks and the rubric audit. It's recorded in `docs/project-1-submission.md`.
 
 **Still to decide:** the Railway trial ends about **2026-11-05**. Either move to a paid plan, or export the database and move the site before then.
 

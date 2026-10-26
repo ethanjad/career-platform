@@ -2,14 +2,14 @@
 
 - **Live site:** https://ethanjad.me (`https://www.ethanjad.me` redirects there)
 - **Repository:** https://github.com/ethanjad/career-platform
-- **Final commit (submitted):** [`359c167ca102c386476eeb29edd38d3c7038b1b8`](https://github.com/ethanjad/career-platform/commit/359c167ca102c386476eeb29edd38d3c7038b1b8). Deployed to Railway as `1abb2326-7f08-4481-a7f0-158bacf443e2` (`SUCCESS`, 2026-10-25 20:55 PDT). The only commit after it writes this line and the status in `TASKS.md`. It can't contain its own SHA.
+- **Final commit (submitted):** [`5252820944f182c74acdee1166ba404e3037b804`](https://github.com/ethanjad/career-platform/commit/5252820944f182c74acdee1166ba404e3037b804). Deployed to Railway as `e8cb7374-8958-4359-81da-940c6625a9d1` (`SUCCESS`, 2026-10-25 21:02 PDT). The only commit after it writes this line and the status in `TASKS.md`. It can't contain its own SHA.
 - **Engineering record:** [README.md](../README.md)
 - **History:** [commit history](https://github.com/ethanjad/career-platform/commits/main), and the dated plans with progress logs in [`docs/superpowers/plans/`](superpowers/plans/) (Azure VM, VM operations, Railway migration). [`TASKS.md`](../TASKS.md) is the gap checklist used to finish the project.
 
-## Checked before submitting (2026-10-25 20:53 PDT, logged out of GitHub)
+## Checked before submitting (2026-10-25 21:02 PDT, logged out of GitHub)
 
 - **Repository:** the repository and the commit page open publicly (HTTP 200).
-- **Evidence files:** all 17 linked files exist on GitHub at the submitted commit.
+- **Evidence files:** all 19 linked files and folders exist on GitHub at the submitted commit, and the commit history page opens.
 - **Live site:** `https://ethanjad.me/`, `http://ethanjad.me/`, `https://www.ethanjad.me/` and `http://www.ethanjad.me/` all end at `https://ethanjad.me/` with HTTP 200 and a valid certificate.
 - **Same version:** the live deployment's app code is identical to the submitted commit. The app code hasn't changed since commit `556fb8f`.
 
