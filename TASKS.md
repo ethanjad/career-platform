@@ -4,7 +4,7 @@ Audit of 2026-10-20 against the Project 1 requirements. Each line names the file
 
 ## Status (2026-10-25)
 
-All items done. Railway's 2026-10-21–22 outage held up the last deploy until 2026-10-25, when it went out as deployment `44a560db`. The final commit SHA is recorded in `docs/project-1-submission.md`.
+All items done. Railway's 2026-10-21–22 outage held up deploys until 2026-10-25. The final commit is `86f4def` (deployment `c73e34b3`, `SUCCESS`), after the post-incident Postgres password rotation. It's recorded in `docs/project-1-submission.md`.
 
 **Still to decide:** the Railway trial ends about **2026-11-05**. Either move to a paid plan, or export the database and move the site before then.
 

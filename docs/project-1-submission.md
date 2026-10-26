@@ -2,7 +2,7 @@
 
 - **Live site:** https://ethanjad.me (`https://www.ethanjad.me` redirects there)
 - **Repository:** https://github.com/ethanjad/career-platform
-- **Final commit:** [`de5fc00eb413f0618be3ebd21c9e0a2a6d019c9d`](https://github.com/ethanjad/career-platform/commit/de5fc00eb413f0618be3ebd21c9e0a2a6d019c9d). Deployed to Railway as `c1e32d22-fa0a-4aae-a7fb-024f7c9ebd04` (`SUCCESS`, 2026-10-25 20:37 PDT). The only commit after it adds this line.
+- **Final commit:** [`86f4def21b2c01c11153ca93be6454df982951c3`](https://github.com/ethanjad/career-platform/commit/86f4def21b2c01c11153ca93be6454df982951c3). Deployed to Railway as `c73e34b3-a723-4b17-bbdf-ab696c46cef2` (`SUCCESS`, 2026-10-25 20:51 PDT). The only commit after it updates this line and the status in `TASKS.md`.
 - **Engineering record:** [README.md](../README.md)
 
 ## The 8 required items
