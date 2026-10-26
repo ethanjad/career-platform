@@ -190,7 +190,7 @@ The copied rows keep ids that seeding could never produce: experience 3–6, pro
 | Python runtime | Me: a uv-managed venv on the VM | Railway, pinned by `.python-version` (3.12) |
 | Entry point / process | Me: systemd unit, `uvicorn --workers 2` | Railway runs `start.sh` (one uvicorn) and restarts it `ON_FAILURE` |
 | Reverse proxy and TLS | Me: nginx + Certbot (Let's Encrypt) | Railway's edge, with automatic Let's Encrypt |
-| Firewall | Me: Azure NSG rules | Railway. Public: the web service, plus a TCP proxy to Postgres (password-protected) used only for laptop-side copies |
+| Firewall | Me: Azure NSG rules | Railway. Only the web service is public. Postgres has no public endpoint (its TCP proxy was removed during Railway's 2026-10-21–22 incident), and one is opened only temporarily for a copy (see "Rollback → Database"). |
 | Code delivery | Me: `ssh` + `git pull` + `systemctl restart` | Railway: build and deploy on each push to `main`, gated by `/healthz` |
 | Configuration and secrets | Me: `.env` on the VM disk | Railway service variables (`DATABASE_URL`, `ADMIN_SECRET`) |
 | Database software | Me: SQLite library inside the app | Railway: managed PostgreSQL 18 service |
@@ -217,18 +217,25 @@ the next push doesn't bring the bad code back.
 
 Content changes go through the admin API, so undoing one is another admin
 call, made with the old values (`PUT /admin/<table>/<id>`) or a `DELETE`.
-Before any risky change, take a copy first:
+Before any risky change, take a copy first.
+
+Postgres has no public endpoint, so the copy runs through a **temporary** TCP proxy that is deleted afterwards:
 
 ```bash
-set -a; . ./.env; set +a
-uv run python -m scripts.copy_database "$RAILWAY_DATABASE_URL" "sqlite:///$HOME/Desktop/github/resume-$(date +%Y%m%d-%H%M).db"
+railway tcp-proxy create --port 5432 --service Postgres   # note the proxy id, host and port it prints
+# DB_URL = postgresql://postgres:<PGPASSWORD>@<proxy host>:<proxy port>/railway
+#   (PGPASSWORD from: railway variables --service Postgres --kv)
+uv run python -m scripts.copy_database "$DB_URL" "sqlite:///$HOME/Desktop/github/resume-$(date +%Y%m%d-%H%M).db"
+railway tcp-proxy delete <proxy-id> --yes                  # close it again
 ```
 
-To restore that copy (this overwrites everything in Postgres):
+To restore that copy (this overwrites everything in Postgres), open the proxy the same way, then:
 
 ```bash
-uv run python -m scripts.copy_database "sqlite:///$HOME/Desktop/github/resume-<stamp>.db" "$RAILWAY_DATABASE_URL" --replace
+uv run python -m scripts.copy_database "sqlite:///$HOME/Desktop/github/resume-<stamp>.db" "$DB_URL" --replace
 ```
+
+For a read-only look without opening anything, run Python inside the web container with `railway ssh --service career-platform`, which reaches Postgres over the private network. This is how the migration was checked on 2026-10-25. The proxy steps above haven't been run since the proxy was removed.
 
 ### Back off Railway, keeping data written after cutover
 
