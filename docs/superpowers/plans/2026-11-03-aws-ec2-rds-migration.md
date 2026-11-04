@@ -458,7 +458,7 @@ Expected: only the `A` answer changed, and `www` still returns `301` to `https:/
   Before committing, search `docs` and `README.md` for the real account ID, Elastic IP and RDS endpoint.
   Expected: none of them appear.
 
-- [ ] **Step 5: Merge to `main`. Needs the owner's OK.** This triggers a Railway build that nobody reaches anymore. Then, on the server, run `deploy/deploy.sh main` and check `/healthz`.
+- [x] **Step 5: Merge to `main`. Needs the owner's OK.** This triggers a Railway build that nobody reaches anymore. Then, on the server, run `deploy/deploy.sh main` and check `/healthz`.
 
 - [ ] **Step 6: After the trial ends,** remove `railway.json` and `start.sh`, and update `tests/` if any of them refer to those files. Confirm the Railway project is gone or stopped on its dashboard, with no paid plan attached.
 
@@ -486,6 +486,7 @@ Stopping isn't enough. A stopped instance still bills for its disk and IP, and a
 
 _(Add dated results here as each step runs.)_
 
+- **2026-11-04, Task 7 Step 5 done.** `aws-migration` fast-forwarded into `main` at `e9eae02`, server redeployed from `main`, site verified, branch deleted locally and on GitHub. Steps 2 and 6 remain.
 - **2026-11-04, Task 7 Steps 3, 4 and 7 done.** `tcp_user_timeout=5000` added to the server's `DATABASE_URL`. Manual snapshot requested. Docs updated. `deploy.sh` now finds `uv` on its own. The whole-branch review was a self-review, not a fresh reviewer. Step 1's wait was skipped because the owner asked to merge now. Steps 2 and 6 remain.
 - **2026-11-04, Task 6 cutover done at 09:26 UTC.** Final dump restored from EC2 into an emptied database and matched Railway. Apex changed from a `CNAME` to Railway to `A <EIP>`, DNS only, with the Cloudflare CLI; no other record changed. The site serves from nginx on AWS. The Zoho test email is still to do.
 - **2026-11-04, Task 5 done.** Let's Encrypt certificate issued through Cloudflare DNS validation, expires 2027-02-02; renewal dry run passes and the timer is on. Through nginx with HTTPS, forced to `<EIP>`: homepage identical to Railway, `http://` redirects with `301`, no `http://` asset links, `change-me` gets `401`, the PDF and privacy page are correct, and bare-IP requests get no answer. No `_acme-challenge` record left behind. DNS still points at Railway.

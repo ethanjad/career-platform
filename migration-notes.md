@@ -27,6 +27,7 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 | 19 | 2026-11-04 | `tcp_user_timeout` not in the plan | Added `tcp_user_timeout=5000` to `DATABASE_URL` on the server | Testing found a 60-second hang on the first request when the database is cut off | Tested on a copy, not during a failure on the live app |
 | 20 | 2026-11-04 | `deploy.sh` as written | Added `~/.local/bin` to its `PATH` | It couldn't find `uv` over a plain SSH command | None |
 | 21 | 2026-11-04 | Fresh reviewer for the whole branch | Self-review by the author | Agents aren't spawned without the owner asking | Weaker than a fresh review. The owner can ask for `/code-review` |
+| 22 | 2026-11-04 | Redeploy from `main` once | Took two runs. The old `deploy.sh` on the server switched to `main`, then exited with `127` because it couldn't find `uv`. The second run used the fixed script and passed | The fix to the script was part of the same commit | None. The old app kept serving until the restart. A failed `uv sync` still doesn't roll back the checkout, which is a known gap |
 
 ## Rules from the owner (2026-11-04)
 
@@ -47,6 +48,8 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 - **2026-11-04, test of `aws.ethanjad.me`:** 38 visitor and admin checks passed, including a create, update and delete through the admin API on RDS that was undone. Desktop and phone screenshots look correct. The homepage, the PDF and all 13 database comparison lines match Railway. Issue found: with the database cut off abruptly, the first request hangs and nginx returns `504` after 60 seconds, then later requests get a fast `503`. An unknown table in an authenticated admin request returns `500`. A throwaway copy with `tcp_user_timeout=5000` in `DATABASE_URL` cut that first request to about 12 seconds. Not applied yet.
 - **2026-11-04, cutover: done at 09:26 UTC.** `ethanjad.me` now points at AWS. Admin edits were frozen during the switch. `tcp_user_timeout` wasn't applied, because the owner hadn't decided.
 - **2026-11-04, timeout fix and docs: done.** See deviations 19 to 21.
+- **2026-11-04, merged to `main`: done.** Server runs `e9eae02` from `main`. `https://ethanjad.me` returns `200` from nginx, homepage unchanged. `aws-migration` deleted. Merging triggered a Railway build, as expected, which visitors don't reach. To do: external uptime check, spending alert, Zoho test email, remove `railway.json` and `start.sh` after the trial ends.
+- **2026-11-04, README: updated.** Added the AWS architecture diagram, the page-load path and what testing found. The Mermaid diagram hasn't been seen rendered.
 
 ## Section 10 test record: `aws.ethanjad.me` (2026-11-04)
 

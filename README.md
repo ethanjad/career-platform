@@ -52,7 +52,55 @@ curl -X POST http://127.0.0.1:8000/admin/projects \
 
 ## Architecture
 
-Diagrams:
+The site runs on one EC2 server and one private RDS database in AWS, as of 2026-11-04. DNS stays on Cloudflare, email on Zoho and analytics on Google, and none of those pass through AWS.
+
+```mermaid
+flowchart TB
+  V["Visitor's browser"]
+  S["Mail servers"]
+
+  subgraph CF["Cloudflare"]
+    DNS["DNS for ethanjad.me<br/>apex and aws: A records, DNS only<br/>MX, SPF, DKIM, DMARC"]
+    WWW["www.ethanjad.me proxy<br/>301 to ethanjad.me"]
+  end
+
+  subgraph AWS["AWS us-east-1a, default VPC"]
+    WSG["Security group career-web-sg<br/>80, 443 from anywhere<br/>22 from my laptop's IP only"]
+    subgraph EC2["EC2 t3.micro, Ubuntu 24.04, Elastic IP"]
+      NGINX["nginx<br/>TLS ends here, Let's Encrypt certificates<br/>80 redirects to 443"]
+      APP["uvicorn + FastAPI + Jinja<br/>systemd service, user career<br/>127.0.0.1:8000, one process"]
+      SNAP[("Profile snapshot<br/>used if the database is down")]
+    end
+    DSG["Security group career-db-sg<br/>5432 from career-web-sg only"]
+    RDS[("RDS PostgreSQL 18<br/>db.t4g.micro, Single-AZ, private<br/>encrypted, 7-day backups")]
+  end
+
+  GA["Google Analytics 4"]
+  ZOHO["Zoho Mail"]
+
+  V -->|"1. DNS lookup, UDP/TCP 53"| DNS
+  V -->|"2. HTTPS 443"| WSG
+  V -->|"www only, HTTPS 443"| WWW
+  WSG --> NGINX
+  NGINX -->|"HTTP over loopback"| APP
+  APP -->|"file read and write"| SNAP
+  APP -->|"PostgreSQL 5432<br/>TLS, verify-full"| DSG
+  DSG --> RDS
+  V -->|"analytics, HTTPS 443"| GA
+  S -->|"SMTP 25, found through MX"| ZOHO
+```
+
+A page load goes like this:
+
+1. The browser asks Cloudflare DNS for `ethanjad.me` and gets the server's Elastic IP.
+2. It connects on port 443, which the security group allows. On port 80, nginx only redirects to HTTPS.
+3. nginx ends the encryption and passes the request to uvicorn over the loopback interface.
+4. FastAPI reads the content from RDS over a verified TLS connection and renders the page with Jinja.
+5. If the database can't be reached, the page returns `503` and shows the profile from the snapshot (see "Database failure behaviour").
+
+`aws.ethanjad.me` reaches the same server and app. It's the name I used to test the AWS copy before the cutover.
+
+More diagrams:
 
 - [docs/request-path.md](docs/request-path.md), with PNG copies in `docs/request-path-*.png`:
   - Azure as it was
@@ -112,6 +160,8 @@ deploy, so the data needed a database outside the container (see the Railway
 section below).
 
 ### Moving from the Azure VM to Railway
+
+*Superseded on 2026-11-04 by [the move to AWS](#moving-from-railway-to-aws-2026-11-04).*
 
 **Chosen:** Railway (managed containers) with Railway's managed PostgreSQL. Migrated on 2026-10-08.
 
@@ -198,7 +248,11 @@ Railway's trial was ending about 2026-11-05. I compared three ways to run the ap
 
 I chose EC2 with RDS to learn AWS and so I don't have to manage the database.
 
+**How it changed what I manage.** Railway ran the OS, TLS, restarts and health-checked deploys. Now I run those, using `unattended-upgrades`, nginx and certbot, systemd and `deploy/deploy.sh`. RDS took over database patching and automated backups, which were manual on Railway. The full comparison is in [docs/aws-architecture.md](docs/aws-architecture.md#who-manages-what).
+
 How the move went: I restored a Railway dump from the EC2 instance into an empty database, tested the copy at `aws.ethanjad.me` while Railway kept serving the real site, compared every table, took a final dump, and then changed the one `ethanjad.me` DNS record. The account's Free plan refused 7-day backups, so I upgraded to the Paid plan.
+
+**What testing found.** When I cut off the database abruptly, the first request hung and nginx returned `504` after 60 seconds, while later requests got a fast `503`. Adding `tcp_user_timeout=5000` to `DATABASE_URL` brought that first request down to about 12 seconds on a test copy. All 22 deviations from the plan, and what I couldn't verify, are in the [migration notes](migration-notes.md).
 
 ## Moving from Azure to Railway and PostgreSQL (2026-10-08)
 
