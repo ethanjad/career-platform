@@ -445,7 +445,7 @@ Expected: only the `A` answer changed, and `www` still returns `301` to `https:/
 
 - [ ] **Step 1: Watch for 24 hours, or until the trial ends, whichever comes first.** Then lift the admin freeze and keep the final dump.
 
-- [ ] **Step 2 (Console): Add an external uptime check** on `https://ethanjad.me/healthz`, with any free monitor. SNS alerts are denied for `isba-student`, and nothing else reports the site being down.
+- [x] **Step 2 (Console): Add an external uptime check** on `https://ethanjad.me/healthz`, with any free monitor. *(Done 2026-11-04 with `.github/workflows/uptime.yml`. First run passed. A failure alert has not been tested.)* SNS alerts are denied for `isba-student`, and nothing else reports the site being down.
 
 - [x] **Step 3: Take a first manual RDS snapshot** with `aws rds create-db-snapshot`. Expected: `available`. To test a real recovery, restore it to a temporary instance only if you accept the extra cost, then delete that instance.
 
