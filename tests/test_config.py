@@ -35,3 +35,10 @@ def test_snapshot_path_defaults_to_data_dir_and_can_be_overridden(monkeypatch):
 
     monkeypatch.setenv("SNAPSHOT_PATH", "/tmp/snap.json")
     assert str(get_settings().snapshot_path) == "/tmp/snap.json"
+
+
+def test_rds_tls_settings_survive_url_normalization():
+    url = "postgresql://u:p@host:5432/db?sslmode=verify-full&sslrootcert=/etc/ca.pem"
+    assert normalize_database_url(url) == (
+        "postgresql+psycopg://u:p@host:5432/db?sslmode=verify-full&sslrootcert=/etc/ca.pem"
+    )

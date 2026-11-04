@@ -1,0 +1,23 @@
+[Unit]
+Description=Career Platform (FastAPI behind nginx)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=career
+Group=career
+WorkingDirectory=/opt/career-platform
+EnvironmentFile=/etc/career-platform/env
+StateDirectory=career-platform
+# Without these the app would quietly use SQLite seed data or the default admin secret.
+ExecStartPre=/bin/sh -c 'test -n "$$DATABASE_URL" && test -n "$$ADMIN_SECRET"'
+# One worker: the profile snapshot is not written atomically.
+ExecStart=/opt/career-platform/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target
