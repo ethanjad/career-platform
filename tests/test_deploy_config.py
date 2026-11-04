@@ -27,6 +27,14 @@ def test_nginx_forwards_scheme_and_redirects_http():
     assert "return 301 https://ethanjad.me$request_uri" in conf
 
 
+def test_nginx_serves_aws_name_over_https_and_redirects_its_http():
+    conf = (DEPLOY / "nginx-career-platform.conf").read_text()
+    assert "return 301 https://aws.ethanjad.me$request_uri" in conf
+    assert "ssl_certificate /etc/letsencrypt/live/aws.ethanjad.me/fullchain.pem" in conf
+    assert "ssl_certificate_key /etc/letsencrypt/live/aws.ethanjad.me/privkey.pem" in conf
+    assert conf.count("proxy_pass http://127.0.0.1:8000") == 2
+
+
 def test_nginx_rejects_unknown_hosts():
     conf = (DEPLOY / "nginx-career-platform.conf").read_text()
     assert "return 444" in conf and "ssl_reject_handshake on" in conf

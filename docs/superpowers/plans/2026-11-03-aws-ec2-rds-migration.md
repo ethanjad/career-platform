@@ -48,6 +48,7 @@ Estimated cost from AWS's public us-east-1 price files, checked 2026-11-03, at 7
 - This repo is public. Keep the AWS account ID, public IPs, RDS endpoint and secrets out of it. Use placeholders such as `<EIP>`, `<RDS_ENDPOINT>` and `<LAPTOP_IP>`, including in the Progress log.
 - Never publish the owner's phone number or home address.
 - Every AWS CLI call uses `--profile isba-4775 --region us-east-1`. Commands below leave this out, so set `export AWS_PROFILE=isba-4775 AWS_REGION=us-east-1` first.
+- **Owner's rules, 2026-11-04:** one phase at a time; Railway stays running and DNS stays unchanged until the owner says otherwise; restore from EC2 into an empty database; `pg_restore` at least as new as Railway's PostgreSQL; no Azure deploy script or seed script on AWS; no secrets in Git.
 - Never put secrets in EC2 user data or in shell commands that print them.
 - Make no admin edits (`/admin/*`) from Task 6 Step 1 until Task 7 Step 1 is complete.
 - Tick steps and add dated results to the Progress log as they run.
@@ -91,7 +92,7 @@ Estimated cost from AWS's public us-east-1 price files, checked 2026-11-03, at 7
 - Produces: service `career-platform` running as user `career` from `/opt/career-platform`. Env file `/etc/career-platform/env`. Snapshot at `/var/lib/career-platform/profile_snapshot.json`.
 - Produces: `deploy/deploy.sh <git-ref>`, `deploy/dump-railway.sh <output-file>`, and `deploy/compare-database.sql`, whose output is `table|count|md5`, then sequences, then the constraint count.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 In `tests/test_config.py`:
 
@@ -131,12 +132,12 @@ def test_privacy_page_names_aws_not_railway():
     assert "Amazon Web Services" in page and "Railway" not in page
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `uv run pytest tests/test_deploy_config.py tests/test_config.py -q`
 Expected: the `test_deploy_config.py` tests FAIL because `deploy/` and the privacy text don't exist. The new `test_config.py` test should already PASS, which pins existing behaviour.
 
-- [ ] **Step 3: Write `deploy/career-platform.service`**
+- [x] **Step 3: Write `deploy/career-platform.service`**
 
 `User=career`, `WorkingDirectory=/opt/career-platform`, `EnvironmentFile=/etc/career-platform/env`, `StateDirectory=career-platform`, `Restart=always`, `NoNewPrivileges=true`, `PrivateTmp=true`, `ProtectSystem=strict`, `After=network-online.target`, `WantedBy=multi-user.target`.
 
@@ -147,7 +148,7 @@ ExecStart=/opt/career-platform/.venv/bin/uvicorn app.main:app --host 127.0.0.1 -
 
 Use one worker. `write_profile_snapshot` isn't atomic, and a partly written file makes `read_profile_snapshot` fall back to defaults.
 
-- [ ] **Step 4: Write `deploy/nginx-career-platform.conf`**
+- [x] **Step 4: Write `deploy/nginx-career-platform.conf`**
 
 Four server blocks:
 - Port 80 `default_server`: `return 444`.
@@ -157,11 +158,11 @@ Four server blocks:
 
 `www` stays on Cloudflare and isn't configured here.
 
-- [ ] **Step 5: Write `deploy/deploy.sh <git-ref>`**
+- [x] **Step 5: Write `deploy/deploy.sh <git-ref>`**
 
 Runs on the server from `/opt/career-platform`. Use `set -euo pipefail`. Record the current commit, `git fetch --prune origin`, `git checkout --detach origin/<ref>`, `uv sync --locked`, `sudo systemctl restart career-platform`, then poll `http://127.0.0.1:8000/healthz` for up to 30 seconds. If it never returns `200`, check out the recorded commit, sync, restart and exit 1.
 
-- [ ] **Step 6: Write `deploy/dump-railway.sh <output-file>`**
+- [x] **Step 6: Write `deploy/dump-railway.sh <output-file>`**
 
 The method proven on 2026-10-29. It needs no public proxy. It streams base64 so SSH can't corrupt the file, fails if either checksum differs, and sets the file to mode `600`.
 
@@ -170,7 +171,7 @@ railway ssh --service Postgres -- 'f=/tmp/bk.dump; pg_dump -U "$PGUSER" -d "$PGD
 # Remote sha = the SHA line. File = the lines between BEGIN and END, with \r and \n removed, then base64 -d.
 ```
 
-- [ ] **Step 7: Write `deploy/compare-database.sql`**
+- [x] **Step 7: Write `deploy/compare-database.sql`**
 
 Based on the 2026-10-29 query, with `COLLATE "C"` so row order can't differ between servers:
 
@@ -185,7 +186,7 @@ select 'seq', sequencename, last_value from pg_sequences where schemaname='publi
 select 'constraints', count(*) from pg_constraint c join pg_namespace n on n.oid=c.connamespace where n.nspname='public';
 ```
 
-- [ ] **Step 8: Update the privacy page**
+- [x] **Step 8: Update the privacy page**
 
 In `templates/privacy.html`, change the date on line 21 to the actual cutover date, and replace line 51 with:
 
@@ -195,12 +196,12 @@ In `templates/privacy.html`, change the date on line 21 to the actual cutover da
 
 Task 3 Step 5 confirms the 14 days. If the server's setting differs, correct this text.
 
-- [ ] **Step 9: Run all the tests**
+- [x] **Step 9: Run all the tests**
 
 Run: `uv run pytest -q`
 Expected: all pass, with the 34 existing tests and the new ones. Also run `bash -n deploy/deploy.sh deploy/dump-railway.sh` and expect no output.
 
-- [ ] **Step 10: Commit to the branch**
+- [x] **Step 10: Commit to the branch**
 
 ```bash
 git add deploy tests/test_deploy_config.py tests/test_config.py templates/privacy.html
@@ -275,21 +276,21 @@ Expected: `PubliclyAccessible=false`, `MultiAZ=false`, `StorageEncrypted=true`, 
 Run: `ssh career-aws 'lsb_release -ds; uname -m; free -m | sed -n 2p'`
 Expected: Ubuntu 24.04, `x86_64`, about 1 GiB of memory.
 
-- [ ] **Step 4 (Server): Install the base packages.** `apt-get update && apt-get upgrade -y`, then `nginx certbot python3-certbot-dns-cloudflare unattended-upgrades`. Install uv. Create system user `career` with no login shell. Make `/opt/career-platform` owned by `ubuntu`, and `/etc/career-platform` owned by `root:career` with mode `750`.
+- [x] **Step 4 (Server): Install the base packages.** `apt-get update && apt-get upgrade -y`, then `nginx certbot python3-certbot-dns-cloudflare unattended-upgrades`. Install uv. Create system user `career` with no login shell. Make `/opt/career-platform` owned by `ubuntu`, and `/etc/career-platform` owned by `root:career` with mode `750`.
 
 Expected: `systemctl is-enabled unattended-upgrades` prints `enabled`.
 
-- [ ] **Step 5 (Server): Confirm log retention.**
+- [x] **Step 5 (Server): Confirm log retention.**
 
 Run: `grep -E 'daily|rotate' /etc/logrotate.d/nginx`
 Expected: `daily` and `rotate 14`, matching the privacy text from Task 1 Step 8. If it differs, set it to match.
 
-- [ ] **Step 6 (Laptop): Push the branch. Needs the owner's OK.**
+- [x] **Step 6 (Laptop): Push the branch. Needs the owner's OK.**
 
 Run: `git push -u origin aws-migration`, then `railway deployment list | head -3`.
 Expected: the latest Railway deployment hasn't changed. Railway must only build `main`. On 2026-10-08 it deployed `main` before a migration branch was merged, so check rather than assume.
 
-- [ ] **Step 7 (Server): Clone and install.**
+- [x] **Step 7 (Server): Clone and install.**
 
 ```bash
 git clone --branch aws-migration https://github.com/ethanjad/career-platform.git /opt/career-platform
@@ -314,11 +315,11 @@ host=<RDS_ENDPOINT> hostaddr=127.0.0.1 port=15432 dbname=career_platform user=ca
 
 `hostaddr` sends traffic down the tunnel while TLS still verifies the real RDS name.
 
-- [ ] **Step 1 (Laptop): Download the RDS certificate bundle** from `https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem` to `~/.config/career-platform/rds-global-bundle.pem`.
+- [x] **Step 1 (Laptop): Download the RDS certificate bundle** from `https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem` to `~/.config/career-platform/rds-global-bundle.pem`.
 
-- [ ] **Step 2 (Laptop): Open the tunnel.** Run `ssh -N -L 15432:<RDS_ENDPOINT>:5432 career-aws`. This uses the laptop's 18.6 tools, because the Ubuntu 24.04 client may be too old to read this dump.
+- [x] **Step 2 (Laptop): Open the tunnel.** *(Superseded 2026-11-04: restores now run from EC2. See `migration-notes.md`.)* Run `ssh -N -L 15432:<RDS_ENDPOINT>:5432 career-aws`. This uses the laptop's 18.6 tools, because the Ubuntu 24.04 client may be too old to read this dump.
 
-- [ ] **Step 3 (Laptop): Create the app role.** Connect as `career_admin` and run:
+- [x] **Step 3 (Laptop): Create the app role.** Connect as `career_admin` and run:
 
 ```sql
 \getenv app_pw APP_PW
@@ -329,10 +330,10 @@ ALTER DATABASE career_platform OWNER TO career_app;
 
 Expected: connecting with `$CONN` works, and `select ssl from pg_stat_ssl where pid = pg_backend_pid()` returns `t`. The app can create its tables but isn't an admin.
 
-- [ ] **Step 4 (Laptop): Take a fresh dump.** Run `deploy/dump-railway.sh ~/Backups/career-platform/railway-rehearsal-<UTC>.dump`.
+- [x] **Step 4 (Laptop): Take a fresh dump.** Run `deploy/dump-railway.sh ~/Backups/career-platform/railway-rehearsal-<UTC>.dump`.
 Expected: the checksums match.
 
-- [ ] **Step 5 (Laptop): Rehearse the restore.**
+- [x] **Step 5 (EC2, changed 2026-11-04): Restore into the empty database,** using `pg_restore` 18 from `postgresql-client-18`, without `--clean`. The command below is the original laptop form.
 
 ```bash
 pg_restore -d "$CONN" --clean --if-exists --no-owner --no-privileges --exit-on-error --single-transaction <dump>
@@ -340,7 +341,7 @@ pg_restore -d "$CONN" --clean --if-exists --no-owner --no-privileges --exit-on-e
 
 Set `PGPASSWORD` from `APP_PW` for this command. Expected: exit 0 with no errors.
 
-- [ ] **Step 6 (Laptop): Compare RDS to Railway.** Run `deploy/compare-database.sql` on both, using `railway ssh --service Postgres` for one and `$CONN` for the other, then `diff` the output.
+- [x] **Step 6: Compare RDS to Railway.** Run `deploy/compare-database.sql` on both, using `railway ssh --service Postgres` for one and `$CONN` for the other, then `diff` the output.
 Expected: no differences. Row counts on 2026-10-29 were education 2, experience 4, links 2, profile 1, projects 7, settings 1, skills 4. Later admin edits could change them, and that's fine as long as both sides match.
 
 ---
@@ -353,7 +354,7 @@ Expected: no differences. Row counts on 2026-10-29 were education 2, experience 
 - Consumes: everything above.
 - Produces: a complete site at `<EIP>` that's reachable only by forcing the name to resolve there. `/etc/career-platform/env` has mode `640`, owner `root:career`.
 
-- [ ] **Step 1 (Server): Write the env file,** without echoing secrets. Copy `ADMIN_SECRET` from the laptop's `.env`, because this migration doesn't rotate it. Also put the RDS bundle at `/etc/career-platform/rds-global-bundle.pem`.
+- [x] **Step 1 (Server): Write the env file,** without echoing secrets. Copy `ADMIN_SECRET` from the laptop's `.env`, because this migration doesn't rotate it. Also put the RDS bundle at `/etc/career-platform/rds-global-bundle.pem`.
 
 ```
 DATABASE_URL=postgresql://career_app:<APP_PW>@<RDS_ENDPOINT>:5432/career_platform?sslmode=verify-full&sslrootcert=/etc/career-platform/rds-global-bundle.pem
@@ -362,12 +363,12 @@ SNAPSHOT_PATH=/var/lib/career-platform/profile_snapshot.json
 ENABLE_FALLBACK=true
 ```
 
-- [ ] **Step 2 (Server): Start the service.** Install the unit from `deploy/`, then `systemctl enable --now career-platform`.
+- [x] **Step 2 (Server): Start the service.** Install the unit from `deploy/`, then `systemctl enable --now career-platform`.
 
 Run: `curl -s 127.0.0.1:8000/healthz; sudo ss -ltnp | grep 8000`
 Expected: `ok`, listening on `127.0.0.1:8000` only.
 
-- [ ] **Step 3 (Server): Issue the certificate.** Write the Task 0 token to `/etc/letsencrypt/cloudflare.ini` with mode `600`.
+- [x] **Step 3 (Server): Issue the certificate.** Write the Task 0 token to `/etc/letsencrypt/cloudflare.ini` with mode `600`.
 
 ```bash
 sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
@@ -377,9 +378,9 @@ sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsenc
 
 Expected: certificate saved under `/etc/letsencrypt/live/ethanjad.me/`. Then `sudo certbot renew --dry-run` succeeds.
 
-- [ ] **Step 4 (Server): Enable nginx.** Install the config from `deploy/`, remove the default site, then run `sudo nginx -t && sudo systemctl reload nginx`.
+- [x] **Step 4 (Server): Enable nginx.** Install the config from `deploy/`, remove the default site, then run `sudo nginx -t && sudo systemctl reload nginx`.
 
-- [ ] **Step 5 (Laptop): Check the site as a visitor would,** with `R="--resolve ethanjad.me:443:<EIP> --resolve ethanjad.me:80:<EIP>"`.
+- [x] **Step 5 (Laptop): Check the site as a visitor would,** with `R="--resolve ethanjad.me:443:<EIP> --resolve ethanjad.me:80:<EIP>"`.
 
 | Check | Expected |
 |---|---|
@@ -393,13 +394,13 @@ Expected: certificate saved under `/etc/letsencrypt/live/ethanjad.me/`. Then `su
 | `ls -l /var/lib/career-platform/profile_snapshot.json` | exists, owned by `career`, holds the real name |
 | `git -C /opt/career-platform status --short` | empty |
 
-- [ ] **Step 6 (Server): Test a database failure and a restart.**
+- [x] **Step 6 (Server): Test a database failure and a restart.**
   - Run `sudo iptables -I OUTPUT -p tcp --dport 5432 -j REJECT`. `/healthz` and `/` return `503`, the profile still shows from the snapshot, and Projects shows "temporarily unavailable".
   - Remove the rule with `sudo iptables -D OUTPUT -p tcp --dport 5432 -j REJECT`. `/healthz` returns `ok`.
   - Run `sudo reboot`. After it returns, `curl -s $R https://ethanjad.me/healthz` from the laptop returns `ok`, with no manual steps.
   - Run `sudo pkill -f uvicorn`. systemd brings it back within seconds.
 
-- [ ] **Step 7 (Server): Test the deploy script.** Run `deploy/deploy.sh aws-migration`.
+- [x] **Step 7 (Server): Test the deploy script.** Run `deploy/deploy.sh aws-migration`.
 Expected: exit 0 and a healthy site. Test its rollback by pushing a temporary branch `deploy-test` where `/healthz` returns 500, then running `deploy/deploy.sh deploy-test`. Expected: exit 1, with the earlier commit running again. Delete `deploy-test` afterwards, locally and on GitHub.
 
 ---
@@ -416,7 +417,7 @@ Expected: exit 0 and a healthy site. Test its rollback by pushing a temporary br
 
 Run: `for t in A MX TXT; do dig +short $t ethanjad.me; done; dig +short www.ethanjad.me` and save the output.
 
-- [ ] **Step 3 (Laptop): Take the final dump, restore and compare,** as in Task 4 Steps 4–6, to `~/Backups/career-platform/railway-final-<UTC>.dump`. Run `sudo systemctl stop career-platform` before the restore and start it afterwards, so nothing reads half-restored tables. Repeat the Task 5 Step 5 page comparison.
+- [ ] **Step 3 (Laptop): Take the final dump, restore and compare,** as in Task 4 Steps 4–6, running the restore from EC2 into an emptied database, to `~/Backups/career-platform/railway-final-<UTC>.dump`. Run `sudo systemctl stop career-platform` before the restore and start it afterwards, so nothing reads half-restored tables. Repeat the Task 5 Step 5 page comparison.
 Expected: `diff` is empty. **Stop here if it isn't.**
 
 - [ ] **Step 4 (Console): Change the apex record only.** In Cloudflare, set `ethanjad.me` to `A <EIP>`, DNS only, with the lowest TTL. Don't touch `www`, MX, TXT or anything else.
@@ -485,6 +486,10 @@ Stopping isn't enough. A stopped instance still bills for its disk and IP, and a
 
 _(Add dated results here as each step runs.)_
 
+- **2026-11-04, Task 5 done.** Let's Encrypt certificate issued through Cloudflare DNS validation, expires 2027-02-02; renewal dry run passes and the timer is on. Through nginx with HTTPS, forced to `<EIP>`: homepage identical to Railway, `http://` redirects with `301`, no `http://` asset links, `change-me` gets `401`, the PDF and privacy page are correct, and bare-IP requests get no answer. No `_acme-challenge` record left behind. DNS still points at Railway.
+- **2026-11-04, Task 5 Steps 1, 2, 6 and 7 done; Steps 3-5 wait for the Cloudflare token.** The app runs as `career` on `127.0.0.1:8000`. Tested on the server, not yet through nginx: the homepage is identical to Railway's, and `change-me` gets `401`. A blocked database gives `503` with the snapshot profile, then recovers. It came back after a reboot and after `kill -9`. The deploy script rolled back a broken deploy. Railway and DNS are unchanged.
+- **2026-11-04, Task 4 done, from EC2.** Restored a fresh Railway dump with `pg_restore` 18.6 into a database with 0 tables. 7 tables, 5 sequences and 35 constraints match Railway. Railway still serves the site, and DNS is unchanged. Details and deviations are in `migration-notes.md`.
+- **2026-11-04, Tasks 1 and 3 done.** Task 1 commit `a937bc9`, 40 tests pass locally. Branch pushed, and Railway's latest deployment is unchanged. Server: packages installed, `unattended-upgrades` enabled, nginx logs rotate daily and keep 14 (matches the privacy text), code cloned to `/opt/career-platform`, 40 tests pass on the server with a clean working tree. Deviations are in `migration-notes.md`.
 - **2026-11-04, Task 3 Steps 1–3 done.** Key `career-aws` created (no passphrase, so the owner can add one with `ssh-keygen -p`). `t3.micro` in `us-east-1a` running, x86_64, IMDSv2 required, hop limit 1, standard credits, termination protection on, 20 GB encrypted gp3. Elastic IP `<EIP>` attached and SSH alias added. `ssh career-aws` works: Ubuntu 24.04.5, x86_64, 909 MiB of memory. A metadata request without a token returns `401`, so IMDSv2 is enforced.
 - **2026-11-04, Task 2 Step 4 done.** After the owner upgraded to the Paid plan, the create call succeeded at 08:05 UTC, on the second background retry. `describe-db-instances` showed `db.t4g.micro`, 18.6, Single-AZ, not public, encrypted, deletion protection on, 7-day backups, 20 GB gp3, `us-east-1a`. Step 5 (waiting for `available`) is still running.
 - **2026-11-03, Task 2 Steps 1–3 done, Step 4 blocked.** Passwords are in `~/.config/career-platform/aws.env` (mode `600`). `career-web-sg` allows 80 and 443 from anywhere and 22 from `<LAPTOP_IP>/32`. `career-db-sg` allows 5432 only from `career-web-sg`. Subnet group `career-platform-db-subnets` is `Complete`. `create-db-instance` failed with `FreeTierRestrictionError` on backup retention, and `describe-db-instances` confirms no instance exists. Waiting for the owner to upgrade to the Paid plan.
