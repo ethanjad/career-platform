@@ -69,10 +69,10 @@ Estimated cost from AWS's public us-east-1 price files, checked 2026-11-03, at 7
 **Files:** none
 
 - [ ] **Step 1 (Console): Set a spending alert.** Sign in with an account that has billing access, then create a monthly AWS Budget of $30 with an email alert at 80%. `isba-student` can't do this.
-- [ ] **Step 2: Confirm the interview date.** The cutover must not fall on the interview day. If the interview is on or before 2026-11-05, decide with the owner whether to cut over before or after it. Record the choice in the Progress log.
+- [x] **Step 2: Confirm the interview date.** *(The owner confirmed on 2026-11-04 that the interview had passed.)* The cutover must not fall on the interview day. If the interview is on or before 2026-11-05, decide with the owner whether to cut over before or after it. Record the choice in the Progress log.
 - [ ] **Step 3: Confirm the three "assumed" rows in Decisions,** and change them here if needed.
-- [ ] **Step 4 (Console): Create a Cloudflare API token.** Permission: Zone → DNS → Edit, limited to zone `ethanjad.me`. Keep it in a password manager for Task 5.
-- [ ] **Step 5 (Console): Write down the current apex record** from the Cloudflare dashboard: type, value, proxy status and TTL. DNS answers with an IP, but the stored record may be a CNAME. Task 6's rollback needs the stored record, so keep it privately.
+- [x] **Step 4 (Console): Create a Cloudflare API token.** *(Done 2026-11-04. See deviation 14.)* Permission: Zone → DNS → Edit, limited to zone `ethanjad.me`. Keep it in a password manager for Task 5.
+- [x] **Step 5 (Console): Write down the current apex record** *(Done with the Cloudflare CLI. See deviation 17.)* from the Cloudflare dashboard: type, value, proxy status and TTL. DNS answers with an IP, but the stored record may be a CNAME. Task 6's rollback needs the stored record, so keep it privately.
 
 ---
 
@@ -252,7 +252,7 @@ First attempt (2026-11-03) failed with `FreeTierRestrictionError`: the Free acco
 
 If this returns `AccessDenied`, stop and add the permission as the account owner. If `db.t4g.micro` is denied, try `db.t3.micro`, which is also orderable on 18.6. Note the price change and record it in the Progress log.
 
-- [ ] **Step 5 (Laptop): Wait and check.**
+- [x] **Step 5 (Laptop): Wait and check.** *(Done 2026-11-04. See the Progress log.)*
 
 Run: `aws rds wait db-instance-available --db-instance-identifier career-platform-db`, then `describe-db-instances`.
 Expected: `PubliclyAccessible=false`, `MultiAZ=false`, `StorageEncrypted=true`, `DeletionProtection=true`, `BackupRetentionPeriod=7`, `EngineVersion=18.6`.
@@ -427,7 +427,7 @@ Expected: `diff` is empty. **Stop here if it isn't.**
 Run: `dig +short ethanjad.me @1.1.1.1`, then `curl -sI https://ethanjad.me/ | grep -i '^server'`, then `curl -s https://ethanjad.me/healthz`.
 Expected: `<EIP>`, `server: nginx` with no `x-railway-*` headers, and `ok`. Open the site in a browser, including `/privacy` and the résumé PDF.
 
-- [ ] **Step 6 (Laptop): Confirm nothing else moved.** Repeat the Step 2 lookups and `curl -sI https://www.ethanjad.me/`.
+- [x] **Step 6 (Laptop): Confirm nothing else moved.** *(Done 2026-11-04: 11 records, none changed since the cutover, `www` still redirects.)* Repeat the Step 2 lookups and `curl -sI https://www.ethanjad.me/`.
 Expected: only the `A` answer changed, and `www` still returns `301` to `https://ethanjad.me/`. Send a test email through Zoho and confirm it arrives.
 
 **Rollback, while Railway is still up:** restore the Task 0 Step 5 record in Cloudflare, then check `curl -s https://ethanjad.me/healthz` and the `x-railway-*` header. With admin edits frozen, Railway's data is still current, so nothing is lost. **After the trial lapses, this rollback no longer exists** and recovery means fixing AWS.

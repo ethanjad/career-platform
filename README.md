@@ -408,7 +408,7 @@ I learned an abundance about the parts that make up the web application, such as
 | Service | Plan | Cost so far |
 |---|---|---|
 | Azure (VM, disk, public IP), Sep – Oct 19 | Azure for Students credit | **$5.00** of credit: storage $2.07, virtual network / IP $2.93, VM compute $0.00 (free allowance). From the Cost Management API, 2026-10-22. |
-| AWS (EC2, disk, public IP, RDS) | Paid plan, with sign-up credits I haven't confirmed | **About $26.82/mo estimated** from AWS's public us-east-1 prices on 2026-11-03: EC2 $7.59, disk $1.60, public IP $3.65, RDS $11.68, RDS storage $2.30. Backups and data transfer should stay in their free allowances. Not yet checked against a bill. |
+| AWS (EC2, disk, public IP, RDS) | Paid plan, with $140 in credits that expire 2027-10-28 (owner's Credits page, 2026-11-04) | **About $26.82/mo estimated** from AWS's public us-east-1 prices on 2026-11-03: EC2 $7.59, disk $1.60, public IP $3.65, RDS $11.68, RDS storage $2.30. Backups and data transfer should stay in their free allowances. The billing page showed $0.00 after credits on 2026-11-04, after about a day of running, so the first full month still has to confirm the estimate. At this rate the credits last until about April 2027. |
 | Railway (web + Postgres) | Trial, no longer serving the site | $0.61 for Oct 5–21 (`railway usage`). **$4.34 of trial credit left, 14 days remaining on 2026-10-22, so the trial ends about 2026-11-05** (Railway dashboard). |
 | Cloudflare DNS + `www` redirect | Free | $0 |
 | Zoho Mail | Free (5 GB, one domain) | $0 |
@@ -426,7 +426,7 @@ I learned an abundance about the parts that make up the web application, such as
 ### Remaining limitations
 
 - **One server and one database in one availability zone, with no replicas.** A failure in `us-east-1a` takes the site down.
-- **Nothing alerts me if the site goes down.** An external uptime check is still to add.
+- **Outage alerts are basic.** A [scheduled GitHub Actions job](.github/workflows/uptime.yml) checks `/healthz` about every 15 minutes from outside AWS. GitHub can start it late, and it stops after 60 days with no repository activity. A failure only reaches me if GitHub's email notifications are on.
 - **Lockouts when my IP changes.** SSH only accepts my laptop's IP, so I update the rule in the AWS console when it changes.
 - **Kernel updates need a manual reboot.** Security updates install automatically, but a reboot is up to me.
 - **Backups stay inside AWS.** RDS keeps them for 7 days. The manual dumps from the move exist only on my laptop.

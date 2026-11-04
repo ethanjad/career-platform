@@ -51,6 +51,8 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 - **2026-11-04, merged to `main`: done.** Server runs `e9eae02` from `main`. `https://ethanjad.me` returns `200` from nginx, homepage unchanged. `aws-migration` deleted. Merging triggered a Railway build, as expected, which visitors don't reach. To do: external uptime check, spending alert, Zoho test email, remove `railway.json` and `start.sh` after the trial ends.
 - **2026-11-04, README: updated.** Added the AWS architecture diagram, the page-load path and what testing found. The Mermaid diagram hasn't been seen rendered.
 
+- **2026-11-04, follow-up.** The admin unknown-table `500` is fixed (`8f26c3f`): the live server returns `404` with a valid secret and `401` without one. The owner reports checking the padlock, a laptop and phone click-through, the LinkedIn link, Google Analytics and Zoho email by hand. Billing page: $0.00 after credits, $139.84 of $140 left. Small load test: 300 requests, 5 at a time, 0 failed, median 352 ms, slowest 550 ms. DNS re-checked: 11 records, none changed since the cutover, `www` still redirects. External uptime check added as a GitHub Actions job. The "Not verified" list below is what was true at the time of the test.
+
 ## Section 10 test record: `aws.ethanjad.me` (2026-11-04)
 
 ### What I tested, and the evidence

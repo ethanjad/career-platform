@@ -64,7 +64,7 @@ Both are from Let's Encrypt and renew through certbot's timer, which reloads ngi
 | Deploy with a health check | Railway, on push to `main` | `deploy/deploy.sh`, run by hand |
 | Database software, patching, backups | Railway ran it; backups were manual | RDS (7-day automated backups) |
 | Firewall | Railway | Security groups |
-| Outage alerts | None | None yet, an external uptime check is still to add |
+| Outage alerts | None | [GitHub Actions check](../.github/workflows/uptime.yml) on `/healthz`, about every 15 minutes |
 
 ## Rebuilding the server
 
