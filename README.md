@@ -431,7 +431,7 @@ I learned an abundance about the parts that make up the web application, such as
 - **Kernel updates need a manual reboot.** Security updates install automatically, but a reboot is up to me.
 - **Backups stay inside AWS.** RDS keeps them for 7 days. The manual dumps from the move exist only on my laptop.
 - **`aws.ethanjad.me` is a full public copy of the site.** It can be indexed and counted in analytics until I remove it or redirect it.
-- **A sudden database failure can still make one request wait.** With `tcp_user_timeout=5000`, a test copy took about 12 seconds on the first request, then later ones returned `503` right away. That setting was tested on a copy, not during a failure on the live app.
+- **A sudden database failure makes requests wait.** In a live test on 2026-11-04 with `tcp_user_timeout=5000`, the first request returned `503` in about 10 seconds and later ones in about 5, which is the app's `connect_timeout`. `/resume.pdf` also took about 5 seconds, though it returned `200`.
 - **DMARC only reports.** It's `p=none`, so forged mail from `ethanjad.me` is reported, not blocked.
 - **No consent banner.** Analytics are blocked by many content blockers, so GA4 under-counts.
 - **Old deploy logs aren't kept.** The Oct 8 build logs were already gone when I looked on Oct 21, so failures have to be recorded on the day.

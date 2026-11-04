@@ -53,6 +53,8 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 
 - **2026-11-04, follow-up.** The admin unknown-table `500` is fixed (`8f26c3f`): the live server returns `404` with a valid secret and `401` without one. The owner reports checking the padlock, a laptop and phone click-through, the LinkedIn link, Google Analytics and Zoho email by hand. Billing page: $0.00 after credits, $139.84 of $140 left. Small load test: 300 requests, 5 at a time, 0 failed, median 352 ms, slowest 550 ms. DNS re-checked: 11 records, none changed since the cutover, `www` still redirects. External uptime check added as a GitHub Actions job. The "Not verified" list below is what was true at the time of the test.
 
+- **2026-11-04, live outage retest.** The owner ran it, with the database blocked by a firewall rule for 25 seconds at 21:30 UTC. Requests went through nginx from the server itself. First request `503` in 10.2 seconds, not `504` after 60. Later requests `503` in about 5 seconds, so not the fast `503` seen earlier: each one waits for the 5-second `connect_timeout`. `/resume.pdf` returned `200` but also took about 5 seconds, cause not looked into. `/healthz` returned `200` within 1 second of unblocking, and no firewall rule was left behind. Response bodies weren't checked in this run.
+
 ## Section 10 test record: `aws.ethanjad.me` (2026-11-04)
 
 ### What I tested, and the evidence
