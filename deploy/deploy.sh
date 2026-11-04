@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Usage: deploy/deploy.sh <git-ref>. Runs on the server. Rolls back if /healthz never returns 200.
 set -euo pipefail
+export PATH="$HOME/.local/bin:$PATH"
 
 ref="${1:?usage: deploy.sh <git-ref>}"
 cd /opt/career-platform

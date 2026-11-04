@@ -411,18 +411,18 @@ Expected: exit 0 and a healthy site. Test its rollback by pushing a temporary br
 
 **Files:** none
 
-- [ ] **Step 1: Freeze admin edits** and record the time.
+- [x] **Step 1: Freeze admin edits** and record the time.
 
-- [ ] **Step 2 (Laptop): Save the current DNS answers.**
+- [x] **Step 2 (Laptop): Save the current DNS answers.**
 
 Run: `for t in A MX TXT; do dig +short $t ethanjad.me; done; dig +short www.ethanjad.me` and save the output.
 
-- [ ] **Step 3 (Laptop): Take the final dump, restore and compare,** as in Task 4 Steps 4–6, running the restore from EC2 into an emptied database, to `~/Backups/career-platform/railway-final-<UTC>.dump`. Run `sudo systemctl stop career-platform` before the restore and start it afterwards, so nothing reads half-restored tables. Repeat the Task 5 Step 5 page comparison.
+- [x] **Step 3 (Laptop): Take the final dump, restore and compare,** as in Task 4 Steps 4–6, running the restore from EC2 into an emptied database, to `~/Backups/career-platform/railway-final-<UTC>.dump`. Run `sudo systemctl stop career-platform` before the restore and start it afterwards, so nothing reads half-restored tables. Repeat the Task 5 Step 5 page comparison.
 Expected: `diff` is empty. **Stop here if it isn't.**
 
-- [ ] **Step 4 (Console): Change the apex record only.** In Cloudflare, set `ethanjad.me` to `A <EIP>`, DNS only, with the lowest TTL. Don't touch `www`, MX, TXT or anything else.
+- [x] **Step 4 (Console): Change the apex record only.** In Cloudflare, set `ethanjad.me` to `A <EIP>`, DNS only, with the lowest TTL. Don't touch `www`, MX, TXT or anything else.
 
-- [ ] **Step 5 (Laptop): Verify from outside.**
+- [x] **Step 5 (Laptop): Verify from outside.**
 
 Run: `dig +short ethanjad.me @1.1.1.1`, then `curl -sI https://ethanjad.me/ | grep -i '^server'`, then `curl -s https://ethanjad.me/healthz`.
 Expected: `<EIP>`, `server: nginx` with no `x-railway-*` headers, and `ok`. Open the site in a browser, including `/privacy` and the résumé PDF.
@@ -447,9 +447,9 @@ Expected: only the `A` answer changed, and `www` still returns `301` to `https:/
 
 - [ ] **Step 2 (Console): Add an external uptime check** on `https://ethanjad.me/healthz`, with any free monitor. SNS alerts are denied for `isba-student`, and nothing else reports the site being down.
 
-- [ ] **Step 3: Take a first manual RDS snapshot** with `aws rds create-db-snapshot`. Expected: `available`. To test a real recovery, restore it to a temporary instance only if you accept the extra cost, then delete that instance.
+- [x] **Step 3: Take a first manual RDS snapshot** with `aws rds create-db-snapshot`. Expected: `available`. To test a real recovery, restore it to a temporary instance only if you accept the extra cost, then delete that instance.
 
-- [ ] **Step 4: Update the docs.**
+- [x] **Step 4: Update the docs.**
   - `docs/aws-architecture.md`: request path, ports, security groups, who manages what, compared with Railway.
   - README: "Updating the live site", "Architecture", "Rollback", "Costs, cleanup and limitations", plus a "Moving from Railway to AWS" decision with the alternatives compared and why they were rejected.
   - `docs/how-this-site-is-secured.md`: nginx TLS, certbot renewal, SSH and security groups are the owner's again.
@@ -462,7 +462,7 @@ Expected: only the `A` answer changed, and `www` still returns `301` to `https:/
 
 - [ ] **Step 6: After the trial ends,** remove `railway.json` and `start.sh`, and update `tests/` if any of them refer to those files. Confirm the Railway project is gone or stopped on its dashboard, with no paid plan attached.
 
-- [ ] **Step 7: Note the remaining limits in the README.**
+- [x] **Step 7: Note the remaining limits in the README.**
   - One server and one database, in one availability zone. A failure in `us-east-1a` takes the site down.
   - Lockouts when the laptop's IP changes. Fix: update the port 22 rule in the console.
   - Kernel updates need a manual reboot.
@@ -486,6 +486,8 @@ Stopping isn't enough. A stopped instance still bills for its disk and IP, and a
 
 _(Add dated results here as each step runs.)_
 
+- **2026-11-04, Task 7 Steps 3, 4 and 7 done.** `tcp_user_timeout=5000` added to the server's `DATABASE_URL`. Manual snapshot requested. Docs updated. `deploy.sh` now finds `uv` on its own. The whole-branch review was a self-review, not a fresh reviewer. Step 1's wait was skipped because the owner asked to merge now. Steps 2 and 6 remain.
+- **2026-11-04, Task 6 cutover done at 09:26 UTC.** Final dump restored from EC2 into an emptied database and matched Railway. Apex changed from a `CNAME` to Railway to `A <EIP>`, DNS only, with the Cloudflare CLI; no other record changed. The site serves from nginx on AWS. The Zoho test email is still to do.
 - **2026-11-04, Task 5 done.** Let's Encrypt certificate issued through Cloudflare DNS validation, expires 2027-02-02; renewal dry run passes and the timer is on. Through nginx with HTTPS, forced to `<EIP>`: homepage identical to Railway, `http://` redirects with `301`, no `http://` asset links, `change-me` gets `401`, the PDF and privacy page are correct, and bare-IP requests get no answer. No `_acme-challenge` record left behind. DNS still points at Railway.
 - **2026-11-04, Task 5 Steps 1, 2, 6 and 7 done; Steps 3-5 wait for the Cloudflare token.** The app runs as `career` on `127.0.0.1:8000`. Tested on the server, not yet through nginx: the homepage is identical to Railway's, and `change-me` gets `401`. A blocked database gives `503` with the snapshot profile, then recovers. It came back after a reboot and after `kill -9`. The deploy script rolled back a broken deploy. Railway and DNS are unchanged.
 - **2026-11-04, Task 4 done, from EC2.** Restored a fresh Railway dump with `pg_restore` 18.6 into a database with 0 tables. 7 tables, 5 sequences and 35 constraints match Railway. Railway still serves the site, and DNS is unchanged. Details and deviations are in `migration-notes.md`.

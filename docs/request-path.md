@@ -2,6 +2,7 @@
 
 Drafted 2026-10-20 with Claude Code from the repository records, as a study aid. Labels ending in `?` are not recorded in this repository (home network details come from Exercise 01) and are unverified.
 
+- **The site has run on AWS since 2026-11-04. See [aws-architecture.md](aws-architecture.md) for that path. The Azure and Railway diagrams here are historical.**
 - The Azure diagram shows the site as it ran until the Railway cutover on 2026-10-08. Email and analytics were added after the cutover, so section 3 shows them.
 - On Railway, `start.sh` runs one uvicorn process. `--workers 2` was only on Azure.
 - On a database failure the app answers 503. The profile comes from the saved snapshot and Projects shows "temporarily unavailable" ([evidence](evidence/db-failure-503.md)).
@@ -75,7 +76,7 @@ sequenceDiagram
   B->>G: load gtag.js, send page_view
 ```
 
-## 3. Railway today: web, data, email and analytics
+## 3. Railway until 2026-11-04: web, data, email and analytics
 
 Locations:
 

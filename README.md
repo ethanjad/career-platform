@@ -2,15 +2,15 @@
 
 A recruiter-facing FastAPI, Jinja, and PostgreSQL résumé site (SQLite for local development).
 
-**Live site:** https://ethanjad.me. `https://www.ethanjad.me` redirects to it. It's hosted on Railway, with DNS on Cloudflare, email on Zoho Mail and analytics in Google Analytics 4.
+**Live site:** https://ethanjad.me. `https://www.ethanjad.me` redirects to it. It's hosted on AWS (EC2 and RDS PostgreSQL) since 2026-11-04, with DNS on Cloudflare, email on Zoho Mail and analytics in Google Analytics 4.
 
 ## Updating the live site
 
-**Code, templates or styles.** Pushing to `main` is the deploy:
+**Code, templates or styles.** Pushing to `main` doesn't deploy anymore. The deploy is a script on the server:
 
 1. **Make the change and run the tests:** `uv run pytest`. Optionally run them against Postgres with `TEST_DATABASE_URL` (see "Deploying on Railway").
 2. **Commit and push:** `git push origin main`.
-3. **Railway deploys it.** Railway builds the new commit and starts it. It only moves traffic to the new container once `/healthz` answers `ok`, so a build that can't reach the database never goes live.
+3. **Deploy it:** `ssh career-aws '/opt/career-platform/deploy/deploy.sh main'`. The script updates the code and dependencies, restarts the app and waits for `/healthz`. If it never answers `200`, the script goes back to the previous commit and exits with an error. Changes to `deploy/career-platform.service` or the nginx config have to be installed by hand.
 4. **Check it live:** `curl -s https://ethanjad.me/healthz`, then open the page. Undo with `git revert` (see "Rollback").
 
 **Content** (experience, projects, skills, links). Use the admin API against the live site. No deploy is needed:
@@ -24,7 +24,7 @@ curl -X POST https://ethanjad.me/admin/projects \
 
 `PUT /admin/<table>/<id>` edits a row and `DELETE` removes one. The same API runs locally (next section).
 
-**Résumé PDF.** Replace `data/resume.pdf` with the web-safe export (no phone number or home address), then commit and push.
+**Résumé PDF.** Replace `data/resume.pdf` with the web-safe export (no phone number or home address), commit and push, then deploy.
 
 ## Run in Codespaces
 
@@ -57,18 +57,21 @@ Diagrams:
 - [docs/request-path.md](docs/request-path.md), with PNG copies in `docs/request-path-*.png`:
   - Azure as it was
   - the order of events for one page load
-  - Railway today: web and analytics, and email
+  - Railway as it was: web and analytics, and email
+- [docs/aws-architecture.md](docs/aws-architecture.md): the AWS setup today, with network rules and who manages what.
 - [docs/azure-architecture.md](docs/azure-architecture.md): the Azure setup step by step, including updates, restarts, email and analytics.
 
 | Path | From → to | Protocol / port | Where |
 |---|---|---|---|
 | Name lookup | browser or mail server → Cloudflare DNS | DNS, UDP/TCP 53 | Cloudflare global anycast |
-| Web page | browser → Railway edge | HTTPS, TCP 443 (80 only redirects) | Railway, region `sfo` |
-| Inside Railway | edge → web container → Postgres | HTTP on `$PORT`, then the Postgres protocol over the private network | Railway |
+| Web page | browser → security group → nginx on EC2 | HTTPS, TCP 443 (80 only redirects) | AWS `us-east-1a` |
+| Inside the server | nginx → uvicorn | HTTP on `127.0.0.1:8000` | EC2 |
+| Database | uvicorn → security group → RDS | Postgres protocol, TCP 5432, TLS with `verify-full` | AWS `us-east-1a`, private |
 | `www` | browser → Cloudflare | HTTPS 443 / HTTP 80, 301 to the apex | Cloudflare |
 | Analytics | browser → `googletagmanager.com`, `google-analytics.com` | HTTPS, TCP 443 | Google |
 | Mail in | sender's server → `mx.zoho.com` | SMTP, TCP 25 | Zoho (US) |
 | Mail out | Zoho `165.173.180.0/24` → receiver | SMTP, TCP 25, TLS 1.3 (observed) | Zoho (US) |
+| *Railway, 2026-10-08 to 2026-11-04* | browser → Railway edge → web container → Postgres | HTTPS 443, then `$PORT`, then Postgres over the private network | Railway, region `sfo` |
 | *Azure, until 2026-10-08* | browser → NSG → nginx → uvicorn → SQLite file | HTTPS 443 / HTTP 80, then `127.0.0.1:8000`, then a file read | Azure Sweden Central |
 
 Email and analytics never pass through the web host. They were set up after the move to Railway.
@@ -76,7 +79,9 @@ Email and analytics never pass through the web host. They were set up after the 
 ## Database failure behaviour
 
 After every successful database read (including the one after each admin
-write), the app saves the public profile to `data/profile_snapshot.json`.
+write), the app saves the public profile to the snapshot file. That's
+`data/profile_snapshot.json` by default and `/var/lib/career-platform/profile_snapshot.json`
+on the server.
 
 If the database can't be reached when `/` is requested:
 
@@ -161,6 +166,8 @@ the final firewall (NSG) rules, and the shutdown and deletion record.
 
 ## Deploying on Railway
 
+*Historical. The site moved to AWS on 2026-11-04. The `TEST_DATABASE_URL` and `copy_database` notes below still apply.*
+
 The `web` service deploys `main` with `railway.json` (start: `start.sh`,
 healthcheck: `/healthz`). It needs two variables:
 
@@ -176,6 +183,22 @@ uv run python -m scripts.copy_database SOURCE_URL TARGET_URL
 
 Run the tests against Postgres by pointing `TEST_DATABASE_URL` at a
 throwaway database whose name contains `test`.
+
+## Moving from Railway to AWS (2026-11-04)
+
+Full record, with tests and deviations: [migration-notes.md](migration-notes.md). Setup: [docs/aws-architecture.md](docs/aws-architecture.md).
+
+Railway's trial was ending about 2026-11-05. I compared three ways to run the app on AWS, using estimates at the time:
+
+| Option | About per month | Upside | Downside |
+|---|---|---|---|
+| EC2 with local PostgreSQL | $10 | Cheapest and fastest to set up | I'd manage backups and upgrades, and one failure takes down the app and the data together |
+| **EC2 with RDS** ✅ | $27 | I learn the core AWS pieces and don't manage the database | Costs the most, and I still run the server |
+| Lambda, API Gateway and RDS | $15 | Almost nothing to operate | Code changes and cold starts, and the snapshot fallback gets weaker |
+
+I chose EC2 with RDS to learn AWS and so I don't have to manage the database.
+
+How the move went: I restored a Railway dump from the EC2 instance into an empty database, tested the copy at `aws.ethanjad.me` while Railway kept serving the real site, compared every table, took a final dump, and then changed the one `ethanjad.me` DNS record. The account's Free plan refused 7-day backups, so I upgraded to the Paid plan.
 
 ## Moving from Azure to Railway and PostgreSQL (2026-10-08)
 
@@ -233,22 +256,28 @@ The copied rows keep ids that seeding could never produce: experience 3–6, pro
 
 ### Code
 
-Every deploy is a commit on `main`, so rolling back code is a revert:
+Every deploy is a commit on `main`, so rolling back code is a revert and a deploy:
 
 ```bash
-git revert <bad-sha>        # new commit that undoes it
-git push origin main        # Railway builds and deploys it like any change
+git revert <bad-sha>
+git push origin main
+ssh career-aws '/opt/career-platform/deploy/deploy.sh main'
 ```
-
-If `main` can't be fixed quickly, redeploy an earlier good build from the
-Railway dashboard (Deployments → ⋯ → Redeploy). Then revert on `main`, so
-the next push doesn't bring the bad code back.
 
 ### Database
 
 Content changes go through the admin API, so undoing one is another admin
 call, made with the old values (`PUT /admin/<table>/<id>`) or a `DELETE`.
-Before any risky change, take a copy first.
+Before any risky change, take a manual snapshot:
+
+```bash
+aws rds create-db-snapshot --profile isba-4775 --region us-east-1 \
+  --db-instance-identifier career-platform-db --db-snapshot-identifier <name>
+```
+
+To go further back, RDS keeps 7 days of automated backups. Restoring either kind creates a new instance, and `DATABASE_URL` then has to point at it.
+
+### Railway-era database copies (historical)
 
 Postgres has no public endpoint, so the copy runs through a **temporary** TCP proxy that is deleted afterwards:
 
@@ -268,7 +297,7 @@ uv run python -m scripts.copy_database "sqlite:///$HOME/Desktop/github/resume-<s
 
 For a read-only look without opening anything, run Python inside the web container with `railway ssh --service career-platform`, which reaches Postgres over the private network. This is how the migration was checked on 2026-10-25. The proxy steps above haven't been run since the proxy was removed.
 
-### Back off Railway, keeping data written after cutover
+### Back off Railway, keeping data written after cutover (historical)
 
 Rolling back to the pre-cutover SQLite export would lose every edit made
 on Railway, such as the "this website, in progress" project. So **export
@@ -325,7 +354,8 @@ I learned an abundance about the parts that make up the web application, such as
 | Service | Plan | Cost so far |
 |---|---|---|
 | Azure (VM, disk, public IP), Sep – Oct 19 | Azure for Students credit | **$5.00** of credit: storage $2.07, virtual network / IP $2.93, VM compute $0.00 (free allowance). From the Cost Management API, 2026-10-22. |
-| Railway (web + Postgres) | Trial | $0.61 for Oct 5–21 (`railway usage`). **$4.34 of trial credit left, 14 days remaining on 2026-10-22, so the trial ends about 2026-11-05** (Railway dashboard). |
+| AWS (EC2, disk, public IP, RDS) | Paid plan, with sign-up credits I haven't confirmed | **About $26.82/mo estimated** from AWS's public us-east-1 prices on 2026-11-03: EC2 $7.59, disk $1.60, public IP $3.65, RDS $11.68, RDS storage $2.30. Backups and data transfer should stay in their free allowances. Not yet checked against a bill. |
+| Railway (web + Postgres) | Trial, no longer serving the site | $0.61 for Oct 5–21 (`railway usage`). **$4.34 of trial credit left, 14 days remaining on 2026-10-22, so the trial ends about 2026-11-05** (Railway dashboard). |
 | Cloudflare DNS + `www` redirect | Free | $0 |
 | Zoho Mail | Free (5 GB, one domain) | $0 |
 | Google Analytics 4 | Free | $0 |
@@ -334,14 +364,20 @@ I learned an abundance about the parts that make up the web application, such as
 ### Cleanup plan
 
 - **Azure, done 2026-10-19:** the VM, disk, IP, NSG and the whole `rg-career-platform` group were deleted. Only `NetworkWatcherRG`, created automatically by Azure and free, remains.
-- **Railway, before about 2026-11-05 (trial end):** either move to a paid plan, or export the database with `copy_database` (see "Rollback") and move the site off Railway before the trial lapses. If the trial lapses, the site goes down.
+- **Railway, about 2026-11-05 (trial end):** done with the move on 2026-11-04, so the trial can lapse. After it does, there's no going back to Railway. Remove `railway.json` and `start.sh` then.
+- **AWS, when the site is retired:** stopping isn't enough, because a stopped server still bills for its disk and IP, and a stopped RDS instance restarts by itself after 7 days. Follow "Stopping or abandoning this migration" in [the plan](docs/superpowers/plans/2026-11-03-aws-ec2-rds-migration.md).
 - **Domain, before 2027-10-01:** renew it, or let it go. If it lapses, the site, email and certificates all stop.
 - **Secrets:** the Postgres password was rotated on 2026-10-25, following Railway's guidance after its 2026-10-21 security incident ([record](docs/evidence/postgres-credential-rotation.md)). `ADMIN_SECRET` was not rotated (my decision). It wasn't covered by Railway's guidance and was never exposed publicly.
 
 ### Remaining limitations
 
-- **One app process and one database, with no replicas.** A Railway outage takes the site down, and during the 2026-10-21–22 incident deploys were paused for more than a day.
-- **Backups are manual.** Nothing exports Postgres on a schedule.
+- **One server and one database in one availability zone, with no replicas.** A failure in `us-east-1a` takes the site down.
+- **Nothing alerts me if the site goes down.** An external uptime check is still to add.
+- **Lockouts when my IP changes.** SSH only accepts my laptop's IP, so I update the rule in the AWS console when it changes.
+- **Kernel updates need a manual reboot.** Security updates install automatically, but a reboot is up to me.
+- **Backups stay inside AWS.** RDS keeps them for 7 days. The manual dumps from the move exist only on my laptop.
+- **`aws.ethanjad.me` is a full public copy of the site.** It can be indexed and counted in analytics until I remove it or redirect it.
+- **A sudden database failure can still make one request wait.** With `tcp_user_timeout=5000`, a test copy took about 12 seconds on the first request, then later ones returned `503` right away. That setting was tested on a copy, not during a failure on the live app.
 - **DMARC only reports.** It's `p=none`, so forged mail from `ethanjad.me` is reported, not blocked.
 - **No consent banner.** Analytics are blocked by many content blockers, so GA4 under-counts.
 - **Old deploy logs aren't kept.** The Oct 8 build logs were already gone when I looked on Oct 21, so failures have to be recorded on the day.

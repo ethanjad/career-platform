@@ -40,6 +40,11 @@ def test_nginx_rejects_unknown_hosts():
     assert "return 444" in conf and "ssl_reject_handshake on" in conf
 
 
+def test_deploy_script_finds_uv_over_a_plain_ssh_command():
+    script = (DEPLOY / "deploy.sh").read_text()
+    assert 'export PATH="$HOME/.local/bin:$PATH"' in script
+
+
 def test_privacy_page_names_aws_not_railway():
     initialize_database()
     page = TestClient(app).get("/privacy").text

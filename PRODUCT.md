@@ -26,9 +26,9 @@ He is a dual Finance and ISBA (Information Systems & Business Analytics) student
 
 ## Operating Context
 
-- FastAPI + Jinja + SQLite app. Deployed on an Azure VM behind HTTPS at ethanjad.me / www.ethanjad.me.
-- Content lives in the VM's SQLite DB and is edited through the admin API (`X-Admin-Secret`), not hardcoded in templates.
-- `data/profile_snapshot.json` is the last-known-good fallback that is served if SQLite fails.
+- FastAPI + Jinja + PostgreSQL app. Deployed on AWS (EC2 and RDS) behind HTTPS at ethanjad.me, with www.ethanjad.me redirecting to it.
+- Content lives in the RDS database and is edited through the admin API (`X-Admin-Secret`), not hardcoded in templates.
+- `data/profile_snapshot.json` is the last-known-good fallback that is served if the database fails.
 
 ## Capabilities and Constraints
 

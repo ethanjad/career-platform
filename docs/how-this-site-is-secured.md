@@ -1,6 +1,20 @@
 # How This Site Is Secured
 
-## Current setup (updated October 18, 2026)
+## Current setup (updated November 4, 2026)
+
+ethanjad.me moved from Railway to AWS on November 4, 2026. Details are in [aws-architecture.md](aws-architecture.md).
+
+**ethanjad.me (AWS).** My DNS record is an A record, DNS only, pointing at my EC2 server's Elastic IP. Encryption begins in the visitor's browser and ends at nginx on that server, which holds the private key. nginx passes the request to the app over the loopback interface. A visitor who uses http:// is redirected to https:// with a 301. The certificate is from Let's Encrypt, covers ethanjad.me and expires on February 2, 2027. certbot renews it automatically through Cloudflare DNS validation, using an API token limited to DNS edits on this domain, and a renewal dry run passed. AWS's own certificates (ACM) only attach to services like load balancers, so the server has its own.
+
+**aws.ethanjad.me (AWS).** The test name has its own Let's Encrypt certificate, also expiring on February 2, 2027, renewed through HTTP validation with certbot's nginx plugin.
+
+**Database.** RDS has no public address. Its firewall accepts port 5432 only from the web server's security group. The app connects with TLS and verifies the server's identity (`verify-full`), and its database user isn't an administrator.
+
+**Open ports.** Ports 80 and 443 are open to everyone. Port 22 is open only to my laptop's IP, and it uses a key, not a password. Port 8000 isn't reachable from outside. Requests that don't use one of my names get no answer. The secrets live in a file on the server, readable only by root and the app's group, and never in Git.
+
+**www.ethanjad.me** still works as described below.
+
+## Setup from October 18, 2026 until the move to AWS
 
 The site no longer runs on my Azure Virtual Machine. ethanjad.me is now hosted on Railway, and www.ethanjad.me is handled by Cloudflare, which redirects it to ethanjad.me. The VM was stopped by its auto-shutdown schedule on October 14 and deleted, with its whole resource group, on October 19, 2026 ([record](evidence/azure-vm-retired.md)). The original write-up below describes the old VM setup.
 

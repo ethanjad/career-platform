@@ -19,9 +19,14 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 | 11 | 2026-11-04 | Step 5 checks run through nginx after the certificate | Ran the app-level checks first, on the server over `127.0.0.1:8000`, with Step 6 and 7 before Steps 3-5 | The Cloudflare token isn't on the server yet | Step 5 must still be run in full through nginx |
 | 12 | 2026-11-04 | `sudo pkill -f uvicorn` for the crash test | Used `kill -9` on the service's main process | The `pkill` pattern most likely matched its own SSH command, so that run reported nothing | None. The retest passed |
 | 13 | 2026-11-04 | Temporary `deploy-test` branch | Pushed to the public GitHub repo with a deliberately broken `/healthz`, then deleted locally and on GitHub | The deploy script fetches from `origin`, so its rollback test needs a pushed branch | None. It was never on `main` and Railway didn't deploy it |
-| 14 | 2026-11-04 | Owner saves the Cloudflare token on the server through a hidden prompt | The first token was pasted into the command by mistake, which exposed it in chat and terminal history, so the owner was asked to delete it and create a new one. Hidden input then led to 5 pastes in one file. The agent kept the one token Cloudflare verified as active and removed the rest, without displaying it | The prompt shows nothing while pasting | The owner must confirm the first token is deleted in Cloudflare |
+| 14 | 2026-11-04 | Owner saves the Cloudflare token on the server through a hidden prompt | The first token was pasted into the command by mistake, which exposed it in chat and terminal history, so the owner was asked to delete it and create a new one. Hidden input then led to 5 pastes in one file. The agent kept the one token Cloudflare verified as active and removed the rest, without displaying it | The prompt shows nothing while pasting | The owner confirmed on 2026-11-04 that the first token is deleted |
 | 15 | 2026-11-04 | No `aws` DNS record in the plan | Owner asked for `aws.ethanjad.me`: `A` to the Elastic IP, DNS only, added with the Cloudflare CLI. A before-and-after listing shows it's the only change: 10 records became 11 | Owner's request | This name didn't serve the site until deviation 16 |
 | 16 | 2026-11-04 | One certificate, for `ethanjad.me`, through Cloudflare DNS validation | Owner asked for HTTPS on `aws.ethanjad.me` the Azure way: a second Let's Encrypt certificate through certbot's nginx plugin (HTTP validation), with HTTP redirecting to HTTPS. nginx now has blocks for this name | Owner's request | Two certificates and two renewal methods. Renewal for this name depends on port 80 staying open |
+| 17 | 2026-11-04 | Owner changes the apex record in the Cloudflare dashboard | Changed with the Cloudflare CLI, keeping the record's ID | Owner asked for help cutting over, and the CLI was already in use for the `aws` record | None. A before-and-after listing shows one changed record |
+| 18 | 2026-11-04 | Watch for 24 hours or until the trial ends before merging | Merged right after the cutover | Owner's instruction | Less time to spot a problem while Railway is still a fallback |
+| 19 | 2026-11-04 | `tcp_user_timeout` not in the plan | Added `tcp_user_timeout=5000` to `DATABASE_URL` on the server | Testing found a 60-second hang on the first request when the database is cut off | Tested on a copy, not during a failure on the live app |
+| 20 | 2026-11-04 | `deploy.sh` as written | Added `~/.local/bin` to its `PATH` | It couldn't find `uv` over a plain SSH command | None |
+| 21 | 2026-11-04 | Fresh reviewer for the whole branch | Self-review by the author | Agents aren't spawned without the owner asking | Weaker than a fresh review. The owner can ask for `/code-review` |
 
 ## Rules from the owner (2026-11-04)
 
@@ -37,3 +42,46 @@ Running record of the move, and every deviation from [the plan](docs/superpowers
 - **2026-11-04, restore from EC2: done.** Fresh Railway dump with a matching checksum, `pg_restore` 18.6, into a database with 0 tables and 0 sequences. All 7 tables, 5 sequences and 35 constraints match Railway exactly. Tables are owned by `career_app` and the connection used verified TLS. The dump was removed from the instance afterwards. The app hasn't been started on AWS.
 - **2026-11-04, app on EC2: partly done.** Service, secrets, outage, crash, reboot and deploy tests pass. HTTPS and nginx wait for the Cloudflare token. Railway and DNS are unchanged.
 - **2026-11-04, app on EC2: done.** HTTPS through nginx passes every visitor check with the name forced to the Elastic IP. Railway and DNS are unchanged. The cutover waits for the owner's go-ahead.
+- **2026-11-04, HTTPS for `aws.ethanjad.me`: done.** Certificate expires 2027-02-02. HTTP redirects with `301`, keeping the path and query. A renewal dry run passes for both certificates. The `ethanjad.me` one first failed with a temporary `rateLimited` "Service busy" reply from Let's Encrypt's test server, and passed on retry. Used `certbot certonly --nginx`, so certbot doesn't edit the nginx config, which stays in `deploy/`. `ethanjad.me` still points at Railway.
+- **2026-11-04, owner confirmed:** first Cloudflare token deleted, database passwords saved, midterm interview already passed, so it no longer limits the cutover date.
+- **2026-11-04, test of `aws.ethanjad.me`:** 38 visitor and admin checks passed, including a create, update and delete through the admin API on RDS that was undone. Desktop and phone screenshots look correct. The homepage, the PDF and all 13 database comparison lines match Railway. Issue found: with the database cut off abruptly, the first request hangs and nginx returns `504` after 60 seconds, then later requests get a fast `503`. An unknown table in an authenticated admin request returns `500`. A throwaway copy with `tcp_user_timeout=5000` in `DATABASE_URL` cut that first request to about 12 seconds. Not applied yet.
+- **2026-11-04, cutover: done at 09:26 UTC.** `ethanjad.me` now points at AWS. Admin edits were frozen during the switch. `tcp_user_timeout` wasn't applied, because the owner hadn't decided.
+- **2026-11-04, timeout fix and docs: done.** See deviations 19 to 21.
+
+## Section 10 test record: `aws.ethanjad.me` (2026-11-04)
+
+### What I tested, and the evidence
+
+| Test | Evidence | Result |
+|---|---|---|
+| `A` record `aws` points at the Elastic IP, DNS only | Cloudflare CLI: `A aws.ethanjad.me <EIP> proxied=False` | Pass |
+| No other record changed | The other 10 records, including their IDs, match the listing taken before `aws` was added | Pass |
+| DNS from the laptop | `nslookup aws.ethanjad.me` returns `<EIP>`, the address AWS reports | Pass |
+| Let's Encrypt certificate | Issuer Let's Encrypt `YE1`, covers `aws.ethanjad.me`, expires 2027-02-02, `curl` verify result `0` | Pass |
+| HTTP redirects to HTTPS | `301` to `https://aws.ethanjad.me/`, keeping path and query | Pass |
+| Renewal | `certbot renew --dry-run` succeeds for both certificates, the first `ethanjad.me` try hit a temporary Let's Encrypt "Service busy" | Pass on retry |
+| Pages and assets | `/`, `/privacy`, `/healthz`, `/resume.pdf` and CSS return `200`; a missing page returns `404`; all 5 same-site links load | Pass |
+| Same content as Railway | Homepage identical after removing host names; `resume.pdf` byte-identical; database: all 7 tables, 5 sequences and constraint count match | Pass |
+| Rendering | Headless Chrome screenshots at 1280 and 500 px wide look correct | Pass |
+| Admin security | No secret, a wrong secret and `change-me` all return `401` | Pass |
+| Admin writes | Create, update and delete through the API on RDS appeared on the page, then were undone; Railway never got the row | Pass |
+| Crash, reboot, deploy rollback | Service came back after `kill -9` and a reboot; a broken deploy rolled back with exit `1` | Pass |
+| External links | 6 of 7 return `200` | Pass, see below |
+| Database cut off suddenly | Later requests return `503` with the profile and notice, the PDF still downloads, and it recovers by itself. **The first request hangs and gets `504` after 60 seconds** | Known issue, not fixed |
+
+38 scripted visitor and admin checks passed. The crash, reboot, rollback, outage and renewal tests were run separately.
+
+### Not verified
+
+- **Padlock in a real browser:** the certificate was checked with `curl` and `openssl`. The owner needs to open the site and look.
+- **Cloudflare dashboard:** the record was checked through the CLI. The owner needs to look for the grey cloud and the unchanged Railway and mail records.
+- **A person using the site:** clicks and layout on a real laptop and phone, beyond screenshots.
+- **LinkedIn link:** LinkedIn answered `999`, which it commonly sends to automated requests, so the link itself is unconfirmed.
+- **`mailto:` link:** not clicked. Zoho mail wasn't tested, and it doesn't depend on this server.
+- **Google Analytics data:** the tag is on the page and its script loads, but I didn't check that visits arrive.
+- **A real RDS restart or failover:** the outage was simulated with a firewall rule on the server.
+- **Load:** no traffic testing.
+- **First bill:** cost is an estimate from AWS's price files. `isba-student` can't read billing.
+- **Spending alert:** not confirmed as set.
+- **`tcp_user_timeout=5000`:** a throwaway copy reduced the first-request hang to about 12 seconds. Applied to the real app afterwards, but not retested with a failure there, to avoid disturbing live visitors.
+
