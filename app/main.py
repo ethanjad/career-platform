@@ -10,7 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from .config import get_settings
-from .database import get_engine, get_profile, initialize_database
+from .database import CONTENT_TABLES, get_engine, get_profile, initialize_database
 from .admin import delete_record, save_record
 
 logger = logging.getLogger(__name__)
@@ -87,9 +87,15 @@ def require_admin(secret: str | None) -> None:
         raise HTTPException(status_code=401, detail="Invalid admin secret")
 
 
+def require_content_table(table: str) -> None:
+    if table not in CONTENT_TABLES:
+        raise HTTPException(status_code=404, detail="Unknown table")
+
+
 @app.post("/admin/{table}")
 def create_admin_record(table: str, payload: dict, x_admin_secret: str | None = Header(default=None)):
     require_admin(x_admin_secret)
+    require_content_table(table)
     save_record(table, payload)
     return {"ok": True}
 
@@ -97,6 +103,7 @@ def create_admin_record(table: str, payload: dict, x_admin_secret: str | None = 
 @app.put("/admin/{table}/{record_id}")
 def update_admin_record(table: str, record_id: int, payload: dict, x_admin_secret: str | None = Header(default=None)):
     require_admin(x_admin_secret)
+    require_content_table(table)
     save_record(table, payload, record_id)
     return {"ok": True}
 
@@ -104,5 +111,6 @@ def update_admin_record(table: str, record_id: int, payload: dict, x_admin_secre
 @app.delete("/admin/{table}/{record_id}")
 def remove_admin_record(table: str, record_id: int, x_admin_secret: str | None = Header(default=None)):
     require_admin(x_admin_secret)
+    require_content_table(table)
     delete_record(table, record_id)
     return {"ok": True}
