@@ -8,7 +8,7 @@ A recruiter-facing FastAPI, Jinja, and PostgreSQL résumé site (SQLite for loca
 
 **Code, templates or styles.** Pushing to `main` doesn't deploy anymore. The deploy is a script on the server:
 
-1. **Make the change and run the tests:** `uv run pytest`. Optionally run them against Postgres with `TEST_DATABASE_URL` (see "Deploying on Railway").
+1. **Make the change and run the tests:** `uv run pytest`. Optionally run them against Postgres with `TEST_DATABASE_URL` (see "Deploying on Railway (historical)").
 2. **Commit and push:** `git push origin main`.
 3. **Deploy it:** `ssh career-aws '/opt/career-platform/deploy/deploy.sh main'`. The script updates the code and dependencies, restarts the app and waits for `/healthz`. If it never answers `200`, the script goes back to the previous commit and exits with an error. Changes to `deploy/career-platform.service` or the nginx config have to be installed by hand.
 4. **Check it live:** `curl -s https://ethanjad.me/healthz`, then open the page. Undo with `git revert` (see "Rollback").
@@ -214,12 +214,12 @@ A full reboot test was never run before the VM was deleted. See
 [azure-vm-retired.md](docs/evidence/azure-vm-retired.md) for what was tested,
 the final firewall (NSG) rules, and the shutdown and deletion record.
 
-## Deploying on Railway
+## Deploying on Railway (historical)
 
-*Historical. The site moved to AWS on 2026-11-04. The `TEST_DATABASE_URL` and `copy_database` notes below still apply.*
+*Historical. The site moved to AWS on 2026-11-04, and the Railway trial ended on 2026-11-05. `railway.json` and `start.sh` were removed from the repo then; they are in git history. `deploy/dump-railway.sh` is kept as a record of how the data was moved. The `TEST_DATABASE_URL` and `copy_database` notes below still apply.*
 
-The `web` service deploys `main` with `railway.json` (start: `start.sh`,
-healthcheck: `/healthz`). It needs two variables:
+The `web` service deployed `main` with `railway.json` (start: `start.sh`,
+healthcheck: `/healthz`). It needed two variables:
 
 - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}` (Railway reference variable)
 - `ADMIN_SECRET` = a long random string
@@ -409,7 +409,7 @@ I learned an abundance about the parts that make up the web application, such as
 |---|---|---|
 | Azure (VM, disk, public IP), Sep – Oct 19 | Azure for Students credit | **$5.00** of credit: storage $2.07, virtual network / IP $2.93, VM compute $0.00 (free allowance). From the Cost Management API, 2026-10-22. |
 | AWS (EC2, disk, public IP, RDS) | Paid plan, with $140 in credits that expire 2027-10-28 (owner's Credits page, 2026-11-04) | **About $26.82/mo estimated** from AWS's public us-east-1 prices on 2026-11-03: EC2 $7.59, disk $1.60, public IP $3.65, RDS $11.68, RDS storage $2.30. Backups and data transfer should stay in their free allowances. The billing page showed $0.00 after credits on 2026-11-04, after about a day of running, so the first full month still has to confirm the estimate. At this rate the credits last until about April 2027. |
-| Railway (web + Postgres) | Trial, no longer serving the site | $0.61 for Oct 5–21 (`railway usage`). **$4.34 of trial credit left, 14 days remaining on 2026-10-22, so the trial ends about 2026-11-05** (Railway dashboard). |
+| Railway (web + Postgres) | Trial, **ended 2026-11-05**; no paid plan attached | $0.61 for Oct 5–21 (`railway usage`). The trial ended on 2026-11-05 (Railway email and dashboard), with no paid plan, so nothing is charged. |
 | Cloudflare DNS + `www` redirect | Free | $0 |
 | Zoho Mail | Free (5 GB, one domain) | $0 |
 | Google Analytics 4 | Free | $0 |
@@ -418,7 +418,7 @@ I learned an abundance about the parts that make up the web application, such as
 ### Cleanup plan
 
 - **Azure, done 2026-10-19:** the VM, disk, IP, NSG and the whole `rg-career-platform` group were deleted. Only `NetworkWatcherRG`, created automatically by Azure and free, remains.
-- **Railway, about 2026-11-05 (trial end):** done with the move on 2026-11-04, so the trial can lapse. After it does, there's no going back to Railway. Remove `railway.json` and `start.sh` then.
+- **Railway, done 2026-11-05:** the trial ended (Railway email; the dashboard says the trial expired and needs an upgrade). No paid plan was attached, so nothing is charged. `railway.json` and `start.sh` were removed, and `RAILWAY_DATABASE_URL` was taken out of the local `.env`. `deploy/dump-railway.sh` stays as a record of how the data was moved. There's no going back to Railway.
 - **AWS, when the site is retired:** stopping isn't enough, because a stopped server still bills for its disk and IP, and a stopped RDS instance restarts by itself after 7 days. Follow "Stopping or abandoning this migration" in [the plan](docs/superpowers/plans/2026-11-03-aws-ec2-rds-migration.md).
 - **Domain, before 2027-10-01:** renew it, or let it go. If it lapses, the site, email and certificates all stop.
 - **Secrets:** the Postgres password was rotated on 2026-10-25, following Railway's guidance after its 2026-10-21 security incident ([record](docs/evidence/postgres-credential-rotation.md)). `ADMIN_SECRET` was not rotated (my decision). It wasn't covered by Railway's guidance and was never exposed publicly.
